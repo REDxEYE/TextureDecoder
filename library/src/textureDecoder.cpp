@@ -1,5 +1,6 @@
 #include <cstdarg>
 #include <cstring>
+#include <cstdio>
 #include "textureDecoder.h"
 #include "converters.h"
 
