@@ -25,7 +25,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release]
-        c_compiler: [gcc, clang, cl]
+        c_compiler: [gcc, cl]
         include:
           - os: windows-latest
             c_compiler: cl
@@ -34,9 +34,9 @@ jobs:
             c_compiler: gcc
             cpp_compiler: g++
         exclude:
-          - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
+#          - os: ubuntu-latest
+#            c_compiler: clang
+#            cpp_compiler: clang++
           - os: windows-latest
             c_compiler: gcc
           - os: windows-latest
@@ -81,11 +81,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: texture-decoder-dll
-        path: ${{ steps.strings.outputs.build-output-dir }}/TextureDecoder.dll
+        path: ${{ steps.strings.outputs.build-output-dir }}\Release\TextureDecoder.dll
 
     - name: Upload TextureDecoder.so (Linux)
       if: runner.os == 'Linux'
       uses: actions/upload-artifact@v3
       with:
         name: texture-decoder-so
-        path: ${{ steps.strings.outputs.build-output-dir }}/TextureDecoder.so
+        path: ${{ steps.strings.outputs.build-output-dir }}\Release\libTextureDecoder.so
