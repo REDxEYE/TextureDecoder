@@ -88,4 +88,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: texture-decoder-so
-        path: ${{ steps.strings.outputs.build-output-dir }}\Release\libTextureDecoder.so
+        path: ${{ steps.strings.outputs.build-output-dir }}/libTextureDecoder.so
