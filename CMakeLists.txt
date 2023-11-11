@@ -7,13 +7,18 @@ set(TextureDecoderSrc
         library/src/textureDecoder.cpp
         library/src/converters.cpp
         library/src/dds/loadDDS.cpp
+        library/src/png/loadPNG.cpp
+        library/src/hdr/loadHDR.cpp
         library/src/rgb.cpp
-        library/src/block_compression.cpp)
+        library/src/block_compression.cpp
+        library/src/stb.cpp
+        libs/half/half.cpp
+        library/src/api.cpp)
 
-add_library(TextureDecoder SHARED ${TextureDecoderSrc})
+add_library(TextureDecoder SHARED ${TextureDecoderSrc} )
 add_library(TextureDecoderStatic STATIC ${TextureDecoderSrc})
-target_include_directories(TextureDecoder PUBLIC library/include libs/bcdec)
-target_include_directories(TextureDecoderStatic PUBLIC library/include libs/bcdec)
+target_include_directories(TextureDecoder PUBLIC library/include libs/bcdec libs/stb libs/half)
+target_include_directories(TextureDecoderStatic PUBLIC library/include libs/bcdec libs/stb libs/half)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -29,14 +34,26 @@ add_executable(
         tester
         tester/src/main.cpp
 )
+
 target_link_libraries(
         tester
         GTest::gtest_main
         TextureDecoderStatic
 )
 
+
 include(GoogleTest)
 gtest_discover_tests(tester
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 
+add_executable(
+        converter
+        converter/src/main.cpp
+        converter/src/main.cpp
+        library/src/png/loadPNG.cpp
+        library/include/api.h)
+target_link_libraries(
+        converter
+        TextureDecoderStatic
+)
