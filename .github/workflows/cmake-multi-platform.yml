@@ -33,10 +33,10 @@ jobs:
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
+        exclude:
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
-        exclude:
           - os: windows-latest
             c_compiler: gcc
           - os: windows-latest
@@ -75,3 +75,17 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
+
+    - name: Upload TextureDecoder.dll (Windows)
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v3
+      with:
+        name: texture-decoder-dll
+        path: ${{ steps.strings.outputs.build-output-dir }}/TextureDecoder.dll
+
+    - name: Upload TextureDecoder.so (Linux)
+      if: runner.os == 'Linux'
+      uses: actions/upload-artifact@v3
+      with:
+        name: texture-decoder-so
+        path: ${{ steps.strings.outputs.build-output-dir }}/TextureDecoder.so
