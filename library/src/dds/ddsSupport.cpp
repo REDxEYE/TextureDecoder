@@ -126,6 +126,8 @@ bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
 
         memcpy(texture->m_rawPixelData.data(), data, pixelDataSize);
     }
+    loggerEx(eLogLevel::INFO, std::format("Loaded DDS {}x{} {}\n", texture->m_width, texture->m_height,
+                                          getPixelFormatName(texture->m_pixelFormat)));
     return true;
 }
 
@@ -209,7 +211,8 @@ void setTextureFormatInfo(sDDSHeader *header, sTexture *texture) {
                         texture->m_pixelFormat = ePixelFormat::BC7;
                         break;
                     default:
-                        loggerEx(eLogLevel::ERROR, std::format("Unsupported DXGI format: {}\n", (uint16_t)dx10Header->m_dxgiFormat));
+                        loggerEx(eLogLevel::ERROR,
+                                 std::format("Unsupported DXGI format: {}\n", (uint16_t) dx10Header->m_dxgiFormat));
                         texture->m_pixelFormat = ePixelFormat::INVALID;
                         break;
                 }

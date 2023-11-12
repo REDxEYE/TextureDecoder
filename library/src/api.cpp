@@ -1,12 +1,16 @@
 #include <cstring>
 #include "api.h"
 #include "texture.h"
+#include "dds/ddsSupport.h"
+#include "png/pngSupport.h"
+#include "hdr/hdrSupport.h"
+#include "tga/tgaSupport.h"
 
-int64_t calculate_texture_size_whpf(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
+int64_t get_buffer_size_from_texture_format(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
     return calculateTextureSize(width, height, pixelFormat);
 }
 
-int64_t calculate_texture_size(const sTexture *texture) {
+int64_t get_buffer_size_from_texture(const sTexture *texture) {
     return calculateTextureSize(texture);
 }
 
@@ -35,9 +39,18 @@ void free_texture(sTexture *texture) {
     freeTexture(texture);
 }
 
-sTexture *load_dds(char *filename) {
+sTexture *load_dds(const char *filename) {
     sTexture *texture = createTexture();
     if (loadDDS(filename, texture)) {
+        return texture;
+    }
+    freeTexture(texture);
+    return nullptr;
+}
+
+sTexture *load_tga(const char *filename, int expected_channels) {
+    sTexture *texture = createTexture();
+    if (loadTGA(filename, texture, expected_channels)) {
         return texture;
     }
     freeTexture(texture);
@@ -55,6 +68,10 @@ sTexture *load_png(const char *filename, int expected_channels) {
 
 bool write_png(const char *filename, const sTexture *texture) {
     return writePNG(filename, texture);
+}
+
+bool write_tga(const char *filename, const sTexture *texture) {
+    return writeTGA(filename, texture);
 }
 
 

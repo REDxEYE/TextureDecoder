@@ -1,9 +1,7 @@
 #pragma once
 
 #include "shared.h"
-#include "dds/ddsSupport.h"
-#include "png/pngSupport.h"
-#include "hdr/hdrSupport.h"
+#include "textureDecoder.h"
 
 extern "C" {
 
@@ -18,9 +16,11 @@ DLL_EXPORT uint32_t get_texture_width(const sTexture *texture);
 DLL_EXPORT uint32_t get_texture_height(const sTexture *texture);
 DLL_EXPORT ePixelFormat get_texture_pixel_format(const sTexture *texture);
 DLL_EXPORT void free_texture(sTexture *texture);
-DLL_EXPORT sTexture *load_dds(char *filename);
+DLL_EXPORT sTexture *load_dds(const char *filename);
 DLL_EXPORT sTexture *load_png(const char *filename, int expected_channels);
-DLL_EXPORT bool write_png(const char *filename, const sTexture* texture);
+DLL_EXPORT sTexture *load_tga(const char *filename, int expected_channels);
 DLL_EXPORT sTexture *load_hdr(const char *filename);
+DLL_EXPORT bool write_png(const char *filename, const sTexture* texture);
+DLL_EXPORT bool write_tga(const char *filename, const sTexture* texture);
 
 }

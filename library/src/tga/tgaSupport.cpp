@@ -1,24 +1,17 @@
-#include <filesystem>
+#include <algorithm>
 #include <cstring>
-#include "png/pngSupport.h"
 #include "texture.h"
+#include "tga/tgaSupport.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "logging.h"
 #include "fileAbstraction.h"
 
-namespace fs = std::filesystem;
-
-
-bool loadPNG(const fs::path &filename, sTexture *texture, uint8_t expectedChannels) {
+bool loadTGA(const std::filesystem::path& filename, sTexture *texture, uint8_t expectedChannels) {
     int realChannelCount;
-    texture->m_pixelFormat = ePixelFormat::INVALID;
-    FILE *file = openFile(filename, "rb");
-    if (file == nullptr)
-        return false;
-    uint8_t *data = stbi_load_from_file(file, (int *) &texture->m_width, (int *) &texture->m_height, &realChannelCount,
-                                        0);
+    uint8_t *data = stbi_load(filename.string().c_str(), (int *) &texture->m_width, (int *) &texture->m_height, &realChannelCount, 0);
     if (data == nullptr) {
+        texture->m_pixelFormat = ePixelFormat::INVALID;
         return false;
     }
     if (expectedChannels == 0) {
@@ -39,18 +32,21 @@ bool loadPNG(const fs::path &filename, sTexture *texture, uint8_t expectedChanne
             texture->m_pixelFormat = ePixelFormat::RGBA8888;
             break;
     }
+
+    texture->m_pixelFormat = ePixelFormat::RGBA8888;
     texture->m_rawPixelData.resize(calculateTextureSize(texture));
     memcpy(texture->m_rawPixelData.data(), data, texture->m_rawPixelData.size());
     stbi_image_free(data);
-    loggerEx(eLogLevel::INFO, std::format("Loaded PNG {}x{} {}\n", texture->m_width, texture->m_height,
+    loggerEx(eLogLevel::INFO, std::format("Loaded TGA {}x{} {}\n", texture->m_width, texture->m_height,
                                           getPixelFormatName(texture->m_pixelFormat)));
     return true;
 }
 
-bool loadPNG(uint8_t *data, size_t dataSize, sTexture *texture, uint8_t expectedChannels) {
+bool loadTGA(uint8_t *data, size_t dataSize, sTexture *texture, uint8_t expectedChannels) {
     int realChannelCount;
-    uint8_t *iData = stbi_load_from_memory(data, dataSize, (int *) &texture->m_width, (int *) &texture->m_height, &realChannelCount,
-                                           expectedChannels);
+    uint8_t *iData = stbi_load_from_memory(data, dataSize, (int *) &texture->m_width,
+                                                          (int *) &texture->m_height, &realChannelCount,
+                                                          0);
     if (iData == nullptr) {
         texture->m_pixelFormat = ePixelFormat::INVALID;
         return false;
@@ -73,21 +69,23 @@ bool loadPNG(uint8_t *data, size_t dataSize, sTexture *texture, uint8_t expected
             texture->m_pixelFormat = ePixelFormat::RGBA8888;
             break;
     }
+
+    texture->m_pixelFormat = ePixelFormat::RGBA8888;
     texture->m_rawPixelData.resize(calculateTextureSize(texture));
     memcpy(texture->m_rawPixelData.data(), iData, texture->m_rawPixelData.size());
-    loggerEx(eLogLevel::INFO, std::format("Loaded PNG {}x{} {}\n", texture->m_width, texture->m_height,
+    loggerEx(eLogLevel::INFO, std::format("Loaded TGA {}x{} {}\n", texture->m_width, texture->m_height,
                                           getPixelFormatName(texture->m_pixelFormat)));
     return true;
 }
 
-bool writePNG(const std::filesystem::path &filename, const sTexture *texture) {
+bool writeTGA(const std::filesystem::path &filename, const sTexture *texture) {
     if (texture->m_pixelFormat != ePixelFormat::RGBA8888 &&
         texture->m_pixelFormat != ePixelFormat::RGB888 &&
         texture->m_pixelFormat != ePixelFormat::RG88 &&
         texture->m_pixelFormat != ePixelFormat::R8
             ) {
         loggerEx(eLogLevel::WARN, std::format(
-                "Input format({}) for PNG isn't an RGBA8888/RGB888/RG88/R8. Will convert it to compatible format\n",
+                "Input format({}) for TGA isn't an RGBA8888/RGB888/RG88/R8. Will convert it to compatible format\n",
                 getPixelFormatName(texture->m_pixelFormat)));
         ePixelFormat tmpPixelFormat = ePixelFormat::RGBA8888;
         loggerEx(eLogLevel::DEBUG, std::format("Converting {} texture with {} channels to {} with {} channels\n",
@@ -112,7 +110,7 @@ bool writePNG(const std::filesystem::path &filename, const sTexture *texture) {
         }
         sTexture *tmpTexture = createTexture(texture->m_width, texture->m_height, tmpPixelFormat);
         if (!convertTexture(texture, tmpTexture)) {
-            loggerEx(eLogLevel::ERROR, "Failed to save PNG\n");
+            loggerEx(eLogLevel::ERROR, "Failed to save TGA\n");
             return false;
         }
         texture = tmpTexture;
@@ -125,19 +123,17 @@ bool writePNG(const std::filesystem::path &filename, const sTexture *texture) {
         return false;
     }
     loggerEx(eLogLevel::DEBUG,
-             std::format("Saving PNG with {} format {} channels\n",
+             std::format("Saving TGA with {} format {} channels\n",
                          getPixelFormatName(texture->m_pixelFormat),
                          getChannelCount(texture->m_pixelFormat)));
-    int stride_in_bytes =
-            texture->m_width * getChannelCount(texture->m_pixelFormat); // Assuming 4 bytes per pixel (RGBA)
-    bool result = stbi_write_png_to_func(fileWriteFunc, file,
+
+    bool result = stbi_write_tga_to_func(fileWriteFunc, file,
                                          texture->m_width, texture->m_height,
                                          getChannelCount(texture->m_pixelFormat), // Number of channels, assuming RGBA
-                                         texture->m_rawPixelData.data(),
-                                         stride_in_bytes);
+                                         texture->m_rawPixelData.data());
 
     fclose(file);
-    loggerEx(eLogLevel::INFO, std::format("Wrote PNG {}x{} {}\n", texture->m_width, texture->m_height,
+    loggerEx(eLogLevel::INFO, std::format("Wrote TGA {}x{} {}\n", texture->m_width, texture->m_height,
                                           getPixelFormatName(texture->m_pixelFormat)));
     return result;
 }

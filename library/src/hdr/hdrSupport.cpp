@@ -3,6 +3,7 @@
 #include "texture.h"
 #include "png/pngSupport.h"
 #include "stb_image.h"
+#include "logging.h"
 
 bool loadHDR(const std::filesystem::path& filename, sTexture *texture) {
     int c;
@@ -15,6 +16,8 @@ bool loadHDR(const std::filesystem::path& filename, sTexture *texture) {
     texture->m_rawPixelData.resize(calculateTextureSize(texture));
     memcpy(texture->m_rawPixelData.data(), data, texture->m_rawPixelData.size());
     stbi_image_free(data);
+    loggerEx(eLogLevel::INFO, std::format("Loaded HDR {}x{} {}\n", texture->m_width, texture->m_height,
+                                          getPixelFormatName(texture->m_pixelFormat)));
     return true;
 }
 
@@ -30,7 +33,8 @@ bool loadHDR(uint8_t *data, size_t dataSize, sTexture *texture) {
     texture->m_pixelFormat = ePixelFormat::RGB32F;
     texture->m_rawPixelData.resize(calculateTextureSize(texture));
     memcpy(texture->m_rawPixelData.data(), iData, texture->m_rawPixelData.size());
-    free(data);
+    loggerEx(eLogLevel::INFO, std::format("Loaded HDR {}x{} {}\n", texture->m_width, texture->m_height,
+                                          getPixelFormatName(texture->m_pixelFormat)));
     return true;
 }
 

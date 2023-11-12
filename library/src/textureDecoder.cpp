@@ -8,7 +8,7 @@ sTexture *createTexture(const uint8_t *data, size_t dataSize,
                         uint32_t width, uint32_t height,
                         ePixelFormat pixelFormat) {
 
-    if (calculateTextureSize(width,height,pixelFormat) < dataSize) {
+    if (calculateTextureSize(width, height, pixelFormat) < dataSize) {
         loggerEx(eLogLevel::ERROR, "Textures width or height doesn't match.\n");
         return nullptr;
     }
@@ -59,6 +59,9 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
 
     uint32_t key = MAKE_PIXEL_PAIR(fromTexture->m_pixelFormat, toTexture->m_pixelFormat);
     if (cConverters.contains(key)) {
+        loggerEx(eLogLevel::DEBUG,
+                 std::format("Converting from {} to {}\n", getPixelFormatName(fromTexture->m_pixelFormat),
+                             getPixelFormatName(toTexture->m_pixelFormat)));
         return cConverters.at(key)(fromTexture, toTexture);
     } else {
         std::vector<uint32_t> fromConverters;
