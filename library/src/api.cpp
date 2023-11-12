@@ -1,5 +1,6 @@
 #include <cstring>
 #include "api.h"
+#include "texture.h"
 
 int64_t calculate_texture_size_whpf(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
     return calculateTextureSize(width, height, pixelFormat);

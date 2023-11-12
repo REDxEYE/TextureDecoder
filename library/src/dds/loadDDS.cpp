@@ -1,35 +1,134 @@
-#include <cstdio>
 #include <cstring>
-#include "dds/loadDDS.h"
+#include <fstream>
+#include <istream>
 
-bool loadDDS(const char *filename, sTexture *texture) {
-    FILE *file;
-#ifdef WIN32
-    if (fopen_s(&file, filename, "rb") != 0) {
-        return false;
-    }
-#else
-    file = fopen(filename, "rb");
-    if (file == nullptr) {
-        return false;
-    }
-#endif
-    fseek(file, 0, 2);
-    size_t fsize = ftell(file);
-    fseek(file, 0, 0);
-    uint8_t *data = new uint8_t[fsize];
-    if (fread(data, 1, fsize, file) != fsize) {
-        delete[] data;
-        return false;
-    }
-    bool res = loadDDS(data, fsize, texture);
-    delete[] data;
-    return res;
-}
+#include "dds/loadDDS.h"
+#include "texture.h"
+#include "logging.h"
+
+namespace fs = std::filesystem;
 
 #define MAKE_FOURCC(ch0, ch1, ch2, ch3) \
         ((uint32_t)(uint8_t)(ch0) | ((uint32_t)(uint8_t)(ch1) << 8) | \
         ((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24))
+
+int bitShift(uint32_t mask);
+
+void setTextureFormatInfo(sDDSHeader *header, sTexture *texture);
+
+bool loadDDS(const fs::path &filename, sTexture *texture) {
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+    if (!file) {
+        return false;
+    }
+
+    size_t fsize = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    std::vector<uint8_t> data(fsize);
+    if (!file.read(reinterpret_cast<char *>(data.data()), fsize)) {
+        return false;
+    }
+
+    bool res = loadDDS(data.data(), fsize, texture);
+    return res;
+}
+
+bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
+    if (dataSize < 4) {
+        loggerEx(eLogLevel::ERROR, "Not enough data to read DDS ident. Possibly truncated file\n");
+        return false;
+    }
+    uint32_t ident = *(uint32_t *) data;
+    data += 4;
+    if (ident != 542327876) { // Not a DDS ident
+        return false;
+    }
+    dataSize -= 4;
+    if (dataSize < 124) {
+        loggerEx(eLogLevel::ERROR, "Not enough data to read DDS header. Possibly truncated file\n");
+        return false;
+    }
+    sDDSHeader *header = (sDDSHeader *) data;
+    data += sizeof(sDDSHeader);
+    dataSize -= 124;
+    texture->m_width = header->m_width;
+    texture->m_height = header->m_height;
+    setTextureFormatInfo(header, texture);
+    if (texture->m_pixelFormat == ePixelFormat::INVALID) {
+        return false;
+    }
+    int64_t pixelDataSize = calculateTextureSize(texture->m_width, texture->m_height, texture->m_pixelFormat);
+    texture->m_rawPixelData.resize(pixelDataSize);
+    if (header->m_flags & eDDSPixelFormatFlags::FOURCC &&
+        header->m_pixelFormat.m_fourCC == MAKE_FOURCC('D', 'X', '1', '0')) {
+        if (dataSize < 20) {
+            loggerEx(eLogLevel::ERROR, "Not enough data to DX10 header. Possibly truncated file\n");
+            return false;
+        }
+        data += sizeof(sDX10Header);
+        dataSize -= 20;
+    }
+    if (dataSize < calculateTextureSize(header->m_width, header->m_height, texture->m_pixelFormat)) {
+        loggerEx(eLogLevel::ERROR, "Not enough data for pixel data. Possibly truncated file\n");
+        return false;
+    }
+    if ((header->m_pixelFormat.m_flags & eDDSPixelFormatFlags::FOURCC) == 0 &&
+        texture->m_pixelFormat >= ePixelFormat::RGBA8888 && texture->m_pixelFormat <= ePixelFormat::RA88) {
+        uint32_t rMask = header->m_pixelFormat.m_rBitMask;
+        uint32_t gMask = header->m_pixelFormat.m_gBitMask;
+        uint32_t bMask = header->m_pixelFormat.m_bBitMask;
+        uint32_t aMask = header->m_pixelFormat.m_aBitMask;
+        uint8_t redShift = bitShift(rMask);
+        uint8_t greenShift = bitShift(gMask);
+        uint8_t blueShift = bitShift(bMask);
+        uint8_t alphaShift = bitShift(aMask);
+        auto *pData = texture->m_rawPixelData.data();
+        switch (texture->m_pixelFormat) {
+            case ePixelFormat::RGBA8888: {
+                for (int i = 0; i < texture->m_rawPixelData.size(); i += 4) {
+                    uint32_t pixel = *(uint32_t *) &data[i];
+                    pData[i + 0] = (pixel & rMask) >> redShift;
+                    pData[i + 1] = (pixel & gMask) >> greenShift;
+                    pData[i + 2] = (pixel & bMask) >> blueShift;
+                    pData[i + 3] = (pixel & aMask) >> alphaShift;
+
+                }
+                break;
+            }
+            case ePixelFormat::RGB888: {
+                for (int i = 0; i < texture->m_rawPixelData.size(); i += 3) {
+                    uint32_t pixel = *(uint32_t *) &data[i];
+                    pData[i + 0] = (pixel & rMask) >> redShift;
+                    pData[i + 1] = (pixel & gMask) >> greenShift;
+                    pData[i + 2] = (pixel & bMask) >> blueShift;
+                }
+                break;
+            }
+            case ePixelFormat::RG88: {
+                for (int i = 0; i < texture->m_rawPixelData.size(); i += 2) {
+                    uint32_t pixel = *(uint32_t *) &data[i];
+                    pData[i + 0] = (pixel & rMask) >> redShift;
+                    pData[i + 1] = (pixel & gMask) >> greenShift;
+                }
+                break;
+            }
+            case ePixelFormat::RA88: {
+                for (int i = 0; i < texture->m_rawPixelData.size(); i += 2) {
+                    uint32_t pixel = *(uint32_t *) &data[i];
+                    pData[i + 0] = (pixel & rMask) >> redShift;
+                    pData[i + 1] = (pixel & aMask) >> alphaShift;
+                }
+                break;
+            }
+        }
+    } else {
+
+        memcpy(texture->m_rawPixelData.data(), data, pixelDataSize);
+    }
+    return true;
+}
+
 
 void setTextureFormatInfo(sDDSHeader *header, sTexture *texture) {
     eDDSPixelFormatFlags flags = header->m_pixelFormat.m_flags;
@@ -110,7 +209,7 @@ void setTextureFormatInfo(sDDSHeader *header, sTexture *texture) {
                         texture->m_pixelFormat = ePixelFormat::BC7;
                         break;
                     default:
-                        logger(3, formatMessage("Unsupported DXGI format: %i\n", dx10Header->m_dxgiFormat));
+                        loggerEx(eLogLevel::ERROR, std::format("Unsupported DXGI format: {}\n", (uint16_t)dx10Header->m_dxgiFormat));
                         texture->m_pixelFormat = ePixelFormat::INVALID;
                         break;
                 }
@@ -162,97 +261,3 @@ int bitShift(uint32_t mask) {
     return shift;
 }
 
-bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
-    if (dataSize < 4) {
-        logger(3, "Not enough data to read DDS ident. Possibly truncated file\n");
-        return false;
-    }
-    uint32_t ident = *(uint32_t *) data;
-    data += 4;
-    if (ident != 542327876) { // Not a DDS ident
-        return false;
-    }
-    dataSize -= 4;
-    if (dataSize < 124) {
-        logger(3, "Not enough data to read DDS header. Possibly truncated file\n");
-        return false;
-    }
-    sDDSHeader *header = (sDDSHeader *) data;
-    data += sizeof(sDDSHeader);
-    dataSize -= 124;
-    texture->m_width = header->m_width;
-    texture->m_height = header->m_height;
-    setTextureFormatInfo(header, texture);
-    if (texture->m_pixelFormat == ePixelFormat::INVALID) {
-        return false;
-    }
-    int64_t pixelDataSize = calculateTextureSize(texture->m_width, texture->m_height, texture->m_pixelFormat);
-    texture->m_rawPixelData.resize(pixelDataSize);
-    if (header->m_flags & eDDSPixelFormatFlags::FOURCC &&
-        header->m_pixelFormat.m_fourCC == MAKE_FOURCC('D', 'X', '1', '0')) {
-        if (dataSize < 20) {
-            logger(3, "Not enough data to DX10 header. Possibly truncated file\n");
-            return false;
-        }
-        data += sizeof(sDX10Header);
-        dataSize -= 20;
-    }
-    if (dataSize < calculateTextureSize(header->m_width, header->m_height, texture->m_pixelFormat)) {
-        logger(3, "Not enough data for pixel data. Possibly truncated file\n");
-        return false;
-    }
-    if ((header->m_pixelFormat.m_flags & eDDSPixelFormatFlags::FOURCC) == 0 &&
-        texture->m_pixelFormat >= ePixelFormat::RGBA8888 && texture->m_pixelFormat <= ePixelFormat::RA88) {
-        uint32_t rMask = header->m_pixelFormat.m_rBitMask;
-        uint32_t gMask = header->m_pixelFormat.m_gBitMask;
-        uint32_t bMask = header->m_pixelFormat.m_bBitMask;
-        uint32_t aMask = header->m_pixelFormat.m_aBitMask;
-        uint8_t redShift = bitShift(rMask);
-        uint8_t greenShift = bitShift(gMask);
-        uint8_t blueShift = bitShift(bMask);
-        uint8_t alphaShift = bitShift(aMask);
-        auto *pData = texture->m_rawPixelData.data();
-        switch (texture->m_pixelFormat) {
-            case ePixelFormat::RGBA8888: {
-                for (int i = 0; i < texture->m_rawPixelData.size(); i += 4) {
-                    uint32_t pixel = *(uint32_t *) &data[i];
-                    pData[i + 0] = (pixel & rMask) >> redShift;
-                    pData[i + 1] = (pixel & gMask) >> greenShift;
-                    pData[i + 2] = (pixel & bMask) >> blueShift;
-                    pData[i + 3] = (pixel & aMask) >> alphaShift;
-
-                }
-                break;
-            }
-            case ePixelFormat::RGB888: {
-                for (int i = 0; i < texture->m_rawPixelData.size(); i += 3) {
-                    uint32_t pixel = *(uint32_t *) &data[i];
-                    pData[i + 0] = (pixel & rMask) >> redShift;
-                    pData[i + 1] = (pixel & gMask) >> greenShift;
-                    pData[i + 2] = (pixel & bMask) >> blueShift;
-                }
-                break;
-            }
-            case ePixelFormat::RG88: {
-                for (int i = 0; i < texture->m_rawPixelData.size(); i += 2) {
-                    uint32_t pixel = *(uint32_t *) &data[i];
-                    pData[i + 0] = (pixel & rMask) >> redShift;
-                    pData[i + 1] = (pixel & gMask) >> greenShift;
-                }
-                break;
-            }
-            case ePixelFormat::RA88: {
-                for (int i = 0; i < texture->m_rawPixelData.size(); i += 2) {
-                    uint32_t pixel = *(uint32_t *) &data[i];
-                    pData[i + 0] = (pixel & rMask) >> redShift;
-                    pData[i + 1] = (pixel & aMask) >> alphaShift;
-                }
-                break;
-            }
-        }
-    } else {
-
-        memcpy(texture->m_rawPixelData.data(), data, pixelDataSize);
-    }
-    return true;
-}

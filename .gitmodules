@@ -4,3 +4,6 @@
 [submodule "libs/half"]
 	path = libs/half
 	url = https://github.com/ramenhut/half
+[submodule "libs/argparse"]
+	path = libs/argparse
+	url = https://github.com/p-ranav/argparse

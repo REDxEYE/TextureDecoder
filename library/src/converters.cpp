@@ -2,6 +2,7 @@
 #include "converters.h"
 #include "bcdec.h"
 #include "half.h"
+#include "texture.h"
 
 
 bool convertRGBA8888toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {

@@ -13,9 +13,10 @@ set(TextureDecoderSrc
         library/src/block_compression.cpp
         library/src/stb.cpp
         libs/half/half.cpp
-        library/src/api.cpp)
+        library/src/api.cpp
+        library/src/logging.cpp)
 
-add_library(TextureDecoder SHARED ${TextureDecoderSrc} )
+add_library(TextureDecoder SHARED ${TextureDecoderSrc})
 add_library(TextureDecoderStatic STATIC ${TextureDecoderSrc})
 target_include_directories(TextureDecoder PUBLIC library/include libs/bcdec libs/stb libs/half)
 target_include_directories(TextureDecoderStatic PUBLIC library/include libs/bcdec libs/stb libs/half)
@@ -29,6 +30,8 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 enable_testing()
+
+add_subdirectory(libs/argparse)
 
 add_executable(
         tester
@@ -56,4 +59,5 @@ add_executable(
 target_link_libraries(
         converter
         TextureDecoderStatic
+        argparse
 )

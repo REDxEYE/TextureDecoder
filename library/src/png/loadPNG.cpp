@@ -1,11 +1,17 @@
 #include <algorithm>
+#include <filesystem>
 #include <cstring>
 #include "png/loadPNG.h"
+#include "texture.h"
 #include "stb_image.h"
+#include "logging.h"
 
-bool loadPNG(const char *filename, sTexture *texture, uint8_t expectedChannels) {
+namespace fs = std::filesystem;
+
+bool loadPNG(const fs::path &filename, sTexture *texture, uint8_t expectedChannels) {
     int c;
-    uint8_t *data = stbi_load(filename, (int *) &texture->m_width, (int *) &texture->m_height, &c, expectedChannels);
+    uint8_t *data = stbi_load(filename.string().c_str(), (int *) &texture->m_width, (int *) &texture->m_height, &c,
+                              expectedChannels);
     if (data == nullptr) {
         texture->m_pixelFormat = ePixelFormat::INVALID;
         return false;
@@ -28,7 +34,7 @@ bool loadPNG(const char *filename, sTexture *texture, uint8_t expectedChannels) 
     }
     texture->m_rawPixelData.resize(calculateTextureSize(texture));
     memcpy(texture->m_rawPixelData.data(), data, texture->m_rawPixelData.size());
-    free(data);
+    stbi_image_free(data);
     return true;
 }
 
@@ -40,7 +46,11 @@ bool loadPNG(uint8_t *data, size_t dataSize, sTexture *texture, uint8_t expected
         texture->m_pixelFormat = ePixelFormat::INVALID;
         return false;
     }
-    expectedChannels = std::max((uint8_t) c, expectedChannels);
+    if (c != expectedChannels) {
+        loggerEx(eLogLevel::WARN, std::format(
+                "PNG had different number of channels({}) that requested({}), it will be converted to requested number of channels",
+                c, expectedChannels));
+    }
     switch (expectedChannels) {
         case 1:
             texture->m_pixelFormat = ePixelFormat::R8;

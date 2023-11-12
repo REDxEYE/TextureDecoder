@@ -1,11 +1,12 @@
 #include <algorithm>
 #include <cstring>
+#include "texture.h"
 #include "png/loadPNG.h"
 #include "stb_image.h"
 
-bool loadHDR(const char *filename, sTexture *texture) {
+bool loadHDR(const std::filesystem::path& filename, sTexture *texture) {
     int c;
-    float *data = stbi_loadf(filename, (int *) &texture->m_width, (int *) &texture->m_height, &c, 3);
+    float *data = stbi_loadf(filename.string().c_str(), (int *) &texture->m_width, (int *) &texture->m_height, &c, 3);
     if (data == nullptr) {
         texture->m_pixelFormat = ePixelFormat::INVALID;
         return false;
@@ -13,7 +14,7 @@ bool loadHDR(const char *filename, sTexture *texture) {
     texture->m_pixelFormat = ePixelFormat::RGB32F;
     texture->m_rawPixelData.resize(calculateTextureSize(texture));
     memcpy(texture->m_rawPixelData.data(), data, texture->m_rawPixelData.size());
-    free(data);
+    stbi_image_free(data);
     return true;
 }
 

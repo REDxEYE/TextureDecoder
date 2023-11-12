@@ -2,6 +2,7 @@
 #include "dds/loadDDS.h"
 #include "png/loadPNG.h"
 #include "hdr/loadHDR.h"
+#include "texture.h"
 #include "textureDecoder.h"
 
 #define STB_IMAGE_IMPLEMENTATION

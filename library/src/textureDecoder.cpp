@@ -1,17 +1,15 @@
-#include <cstdarg>
 #include <cstring>
-#include <cstdio>
 #include "textureDecoder.h"
+#include "texture.h"
 #include "converters.h"
-
-loggerFn logger = &defaultLogger;
+#include "logging.h"
 
 sTexture *createTexture(const uint8_t *data, size_t dataSize,
                         uint32_t width, uint32_t height,
                         ePixelFormat pixelFormat) {
 
     if (calculateTextureSize(width,height,pixelFormat) < dataSize) {
-        logger(1, "Textures width or height doesn't match.\n");
+        loggerEx(eLogLevel::ERROR, "Textures width or height doesn't match.\n");
         return nullptr;
     }
     std::vector<uint8_t> vData(data, data + dataSize);
@@ -50,7 +48,7 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_width != toTexture->m_width &&
         fromTexture->m_height != toTexture->m_height
             ) {
-        logger(1, "Textures width or height doesn't match.\n");
+        loggerEx(eLogLevel::ERROR, "Textures width or height doesn't match.\n");
         return false;
     }
 
@@ -84,7 +82,7 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
             }
         }
         if (matchedIntermediate == ePixelFormat::INVALID) {
-            logger(3, formatMessage("Failed to find intermediate converters from %s to %s\n",
+            loggerEx(eLogLevel::ERROR, std::format("Failed to find intermediate converters from {} to {}\n",
                                     getPixelName(fromTexture->m_pixelFormat),
                                     getPixelName(toTexture->m_pixelFormat)));
             return false;
@@ -92,27 +90,27 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
         uint32_t key0 = MAKE_PIXEL_PAIR(fromTexture->m_pixelFormat, matchedIntermediate);
         uint32_t key1 = MAKE_PIXEL_PAIR(matchedIntermediate, toTexture->m_pixelFormat);
         if (!cConverters.contains(key0)) {
-            logger(3, formatMessage("Failed to find converter from %s to %s\n",
+            loggerEx(eLogLevel::ERROR, std::format("Failed to find converter from {} to {}\n",
                                     getPixelName(fromTexture->m_pixelFormat),
                                     getPixelName(matchedIntermediate)));
             return false;
         }
         if (!cConverters.contains(key1)) {
-            logger(3, formatMessage("Failed to find intermediate converter from %s to %s\n",
+            loggerEx(eLogLevel::ERROR, std::format("Failed to find intermediate converter from {} to {}\n",
                                     getPixelName(matchedIntermediate),
                                     getPixelName(toTexture->m_pixelFormat)));
             return false;
         }
         sTexture *tmpTexture = createTexture(fromTexture->m_width, fromTexture->m_height, matchedIntermediate);
         if (!convertTexture(fromTexture, tmpTexture)) {
-            logger(3, formatMessage("Failed to convert from %s to %s\n",
+            loggerEx(eLogLevel::ERROR, std::format("Failed to convert from {} to {}\n",
                                     getPixelName(fromTexture->m_pixelFormat),
                                     getPixelName(tmpTexture->m_pixelFormat)));
             freeTexture(tmpTexture);
             return false;
         }
         if (!convertTexture(tmpTexture, toTexture)) {
-            logger(3, formatMessage("Failed to convert from %s to %s\n",
+            loggerEx(eLogLevel::ERROR, std::format("Failed to convert from {} to {}\n",
                                     getPixelName(tmpTexture->m_pixelFormat),
                                     getPixelName(toTexture->m_pixelFormat)));
             freeTexture(tmpTexture);
@@ -246,38 +244,4 @@ const char *getPixelName(ePixelFormat pixelFormat) {
             return "BC7";
     }
 }
-
-char *formatMessage(const char *fmt, ...) {
-    static char buffer[8192];
-    va_list arg_list;
-            va_start(arg_list, fmt);
-#ifdef WIN32
-    vsprintf_s(buffer, fmt, arg_list);
-#else
-    vsprintf(buffer, fmt, arg_list);
-#endif
-
-    return buffer;
-}
-
-void defaultLogger(uint8_t level, const char *message) {
-    const char *levelName;
-    switch (level) {
-        case 0:
-            levelName = "DEBUG";
-            break;
-        default:
-        case 1:
-            levelName = "INFO";
-            break;
-        case 2:
-            levelName = "WARN";
-            break;
-        case 3:
-            levelName = "ERROR";
-            break;
-    }
-    printf("[%-5s]: %s", levelName, message);
-}
-
 
