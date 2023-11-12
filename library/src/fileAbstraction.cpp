@@ -1,5 +1,5 @@
+#include <vector>
 #include "fileAbstraction.h"
-
 
 FILE *openFile(const std::filesystem::path &path, const char *mode) {
     FILE *file = nullptr;
