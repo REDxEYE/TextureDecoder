@@ -1,8 +1,18 @@
 #pragma once
 
 #include <cstdint>
-#include <format>
+#include <string>
 
+#if __cplusplus >= 202002L && defined(__cpp_lib_format)
+#include <format>
+#else
+
+    #include "fmt/format.h"
+
+namespace std {
+    using namespace fmt;
+}
+#endif
 enum eLogLevel {
     DEBUG,
     INFO,

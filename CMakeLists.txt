@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.25)
 project(TextureDecoder)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+add_subdirectory(libs/argparse)
 
 set(TextureDecoderSrc
         library/src/textureDecoder.cpp
@@ -17,38 +20,10 @@ set(TextureDecoderSrc
         library/src/logging.cpp)
 
 add_library(TextureDecoder SHARED ${TextureDecoderSrc})
-add_library(TextureDecoderStatic STATIC ${TextureDecoderSrc})
 target_include_directories(TextureDecoder PUBLIC library/include libs/bcdec libs/stb libs/half)
+
+add_library(TextureDecoderStatic STATIC ${TextureDecoderSrc})
 target_include_directories(TextureDecoderStatic PUBLIC library/include libs/bcdec libs/stb libs/half)
-
-include(FetchContent)
-FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-enable_testing()
-
-add_subdirectory(libs/argparse)
-
-add_executable(
-        tester
-        tester/src/main.cpp
-)
-
-target_link_libraries(
-        tester
-        GTest::gtest_main
-        TextureDecoderStatic
-)
-
-
-include(GoogleTest)
-gtest_discover_tests(tester
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-
 
 add_executable(
         converter
@@ -61,3 +36,48 @@ target_link_libraries(
         TextureDecoderStatic
         argparse
 )
+
+add_executable(
+        tester
+        tester/src/main.cpp
+)
+target_link_libraries(
+        tester
+        TextureDecoderStatic
+)
+
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    include(FetchContent)
+
+    FetchContent_Declare(
+            fmt
+            GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+            GIT_TAG master  # You can specify a specific tag or commit if needed
+    )
+
+    FetchContent_MakeAvailable(fmt)
+
+    target_link_libraries(TextureDecoder fmt::fmt)
+    target_link_libraries(TextureDecoderStatic fmt::fmt)
+    target_link_libraries(tester fmt::fmt)
+    target_link_libraries(converter fmt::fmt)
+endif()
+enable_testing()
+
+target_link_libraries(
+        tester
+        GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(tester
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
