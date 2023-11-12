@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 
-#if __cplusplus >= 202002L && defined(__cpp_lib_format)
+#if defined(__cpp_lib_format)
 #include <format>
 #else
 
