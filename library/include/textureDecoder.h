@@ -6,7 +6,7 @@
 struct sTexture;
 
 
-const char *getPixelName(ePixelFormat pixelFormat);
+const char *getPixelFormatName(ePixelFormat pixelFormat);
 
 
 int64_t calculateTextureSize(uint32_t width, uint32_t height, ePixelFormat pixelFormat);

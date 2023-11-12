@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <cstring>
 #include "texture.h"
-#include "png/loadPNG.h"
+#include "png/pngSupport.h"
 #include "stb_image.h"
 
 bool loadHDR(const std::filesystem::path& filename, sTexture *texture) {

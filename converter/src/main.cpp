@@ -1,8 +1,6 @@
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-
 #include "stb_image_write.h"
 #include "textureDecoder.h"
-#include "dds/loadDDS.h"
+#include "dds/ddsSupport.h"
 #include "texture.h"
 #include "logging.h"
 #include <filesystem>
@@ -16,7 +14,7 @@ std::string getAllPixelFormats() {
     std::stringstream ss;
     ss << "Supported pixel formats: ";
     for (uint16_t i = ePixelFormat::RGBA32; i < ePixelFormat::RGBA5551; ++i) {
-        ss << getPixelName(ePixelFormat(i)) << " ";
+        ss << getPixelFormatName(ePixelFormat(i)) << " ";
     }
     return ss.str();
 }

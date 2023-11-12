@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 enum ePixelFormat : uint16_t {
     INVALID,
@@ -35,3 +36,7 @@ enum ePixelFormat : uint16_t {
     BC7
 
 };
+
+const char *getPixelFormatName(ePixelFormat pixelFormat);
+
+int getChannelCount(ePixelFormat format);

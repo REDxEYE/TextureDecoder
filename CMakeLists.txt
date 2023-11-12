@@ -9,15 +9,15 @@ add_subdirectory(libs/argparse)
 set(TextureDecoderSrc
         library/src/textureDecoder.cpp
         library/src/converters.cpp
-        library/src/dds/loadDDS.cpp
-        library/src/png/loadPNG.cpp
-        library/src/hdr/loadHDR.cpp
+        library/src/dds/ddsSupport.cpp
+        library/src/png/pngSupport.cpp
+        library/src/hdr/hdrSupport.cpp
         library/src/rgb.cpp
         library/src/block_compression.cpp
         library/src/stb.cpp
         libs/half/half.cpp
         library/src/api.cpp
-        library/src/logging.cpp)
+        library/src/logging.cpp library/src/pixelFormat.cpp)
 
 add_library(TextureDecoder SHARED ${TextureDecoderSrc})
 target_include_directories(TextureDecoder PUBLIC library/include libs/bcdec libs/stb libs/half)
@@ -29,7 +29,7 @@ add_executable(
         converter
         converter/src/main.cpp
         converter/src/main.cpp
-        library/src/png/loadPNG.cpp
+        library/src/png/pngSupport.cpp
         library/include/api.h)
 target_link_libraries(
         converter

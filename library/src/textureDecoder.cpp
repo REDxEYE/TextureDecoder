@@ -83,36 +83,36 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
         }
         if (matchedIntermediate == ePixelFormat::INVALID) {
             loggerEx(eLogLevel::ERROR, std::format("Failed to find intermediate converters from {} to {}\n",
-                                    getPixelName(fromTexture->m_pixelFormat),
-                                    getPixelName(toTexture->m_pixelFormat)));
+                                                   getPixelFormatName(fromTexture->m_pixelFormat),
+                                                   getPixelFormatName(toTexture->m_pixelFormat)));
             return false;
         }
         uint32_t key0 = MAKE_PIXEL_PAIR(fromTexture->m_pixelFormat, matchedIntermediate);
         uint32_t key1 = MAKE_PIXEL_PAIR(matchedIntermediate, toTexture->m_pixelFormat);
         if (!cConverters.contains(key0)) {
             loggerEx(eLogLevel::ERROR, std::format("Failed to find converter from {} to {}\n",
-                                    getPixelName(fromTexture->m_pixelFormat),
-                                    getPixelName(matchedIntermediate)));
+                                                   getPixelFormatName(fromTexture->m_pixelFormat),
+                                                   getPixelFormatName(matchedIntermediate)));
             return false;
         }
         if (!cConverters.contains(key1)) {
             loggerEx(eLogLevel::ERROR, std::format("Failed to find intermediate converter from {} to {}\n",
-                                    getPixelName(matchedIntermediate),
-                                    getPixelName(toTexture->m_pixelFormat)));
+                                                   getPixelFormatName(matchedIntermediate),
+                                                   getPixelFormatName(toTexture->m_pixelFormat)));
             return false;
         }
         sTexture *tmpTexture = createTexture(fromTexture->m_width, fromTexture->m_height, matchedIntermediate);
         if (!convertTexture(fromTexture, tmpTexture)) {
             loggerEx(eLogLevel::ERROR, std::format("Failed to convert from {} to {}\n",
-                                    getPixelName(fromTexture->m_pixelFormat),
-                                    getPixelName(tmpTexture->m_pixelFormat)));
+                                                   getPixelFormatName(fromTexture->m_pixelFormat),
+                                                   getPixelFormatName(tmpTexture->m_pixelFormat)));
             freeTexture(tmpTexture);
             return false;
         }
         if (!convertTexture(tmpTexture, toTexture)) {
             loggerEx(eLogLevel::ERROR, std::format("Failed to convert from {} to {}\n",
-                                    getPixelName(tmpTexture->m_pixelFormat),
-                                    getPixelName(toTexture->m_pixelFormat)));
+                                                   getPixelFormatName(tmpTexture->m_pixelFormat),
+                                                   getPixelFormatName(toTexture->m_pixelFormat)));
             freeTexture(tmpTexture);
             return false;
         }
@@ -173,75 +173,6 @@ int64_t calculateTextureSize(uint32_t width, uint32_t height, ePixelFormat pixel
         case RGB16:
         case RGB16F:
             return width * height * 6;
-    }
-}
-
-const char *getPixelName(ePixelFormat pixelFormat) {
-    switch (pixelFormat) {
-        case INVALID:
-            return "INVALID";
-        case RGBA32:
-            return "RGBA32";
-        case RGB32:
-            return "RGB32";
-        case RG32:
-            return "RG32";
-        case R32:
-            return "R32";
-        case RGBA16:
-            return "RGBA16";
-        case RGB16:
-            return "RGB16";
-        case RG16:
-            return "RG16";
-        case R16:
-            return "R16";
-        case RGBA32F:
-            return "RGBA32F";
-        case RGB32F:
-            return "RGB32F";
-        case RG32F:
-            return "RG32F";
-        case R32F:
-            return "R32F";
-        case RGBA16F:
-            return "RGBA16F";
-        case RGB16F:
-            return "RGB16F";
-        case RG16F:
-            return "RG16F";
-        case R16F:
-            return "R16F";
-        case RGBA8888:
-            return "RGBA8888";
-        case RGB888:
-            return "RGB888";
-        case RG88:
-            return "RG88";
-        case RA88:
-            return "RA88";
-        case R8:
-            return "R8";
-        case RGB565:
-            return "RGB565";
-        case RGBA5551:
-            return "RGBA5551";
-        case BC1:
-            return "BC1";
-        case BC1a:
-            return "BC1a";
-        case BC2:
-            return "BC2";
-        case BC3:
-            return "BC3";
-        case BC4:
-            return "BC4";
-        case BC5:
-            return "BC5";
-        case BC6:
-            return "BC6";
-        case BC7:
-            return "BC7";
     }
 }
 

@@ -11,33 +11,33 @@ enum eDDSPixelFormatFlags : uint32_t {
 };
 
 struct sDDSPixelFormat {
-    uint32_t m_size;
-    eDDSPixelFormatFlags m_flags;
-    uint32_t m_fourCC;
-    uint32_t m_rGBBitCount;
-    uint32_t m_rBitMask;
-    uint32_t m_gBitMask;
-    uint32_t m_bBitMask;
-    uint32_t m_aBitMask;
+    uint32_t m_size{0};
+    eDDSPixelFormatFlags m_flags{eDDSPixelFormatFlags(0)};
+    uint32_t m_fourCC{0};
+    uint32_t m_rGBBitCount{0};
+    uint32_t m_rBitMask{0};
+    uint32_t m_gBitMask{0};
+    uint32_t m_bBitMask{0};
+    uint32_t m_aBitMask{0};
 };
 struct sDDSHeader {
-    uint32_t m_size;
-    uint32_t m_flags;
-    uint32_t m_height;
-    uint32_t m_width;
-    uint32_t m_pitchOrLinearSize;
-    uint32_t m_depth;
-    uint32_t m_mipMapCount;
-    uint32_t m_reserved1[11];
-    sDDSPixelFormat m_pixelFormat;
-    uint32_t m_caps;
-    uint32_t m_caps2;
-    uint32_t m_caps3;
-    uint32_t m_caps4;
-    uint32_t m_reserved2;
+    uint32_t m_size{0};
+    uint32_t m_flags{0};
+    uint32_t m_height{0};
+    uint32_t m_width{0};
+    uint32_t m_pitchOrLinearSize{0};
+    uint32_t m_depth{0};
+    uint32_t m_mipMapCount{0};
+    uint32_t m_reserved1[11]{0};
+    sDDSPixelFormat m_pixelFormat{0};
+    uint32_t m_caps{0};
+    uint32_t m_caps2{0};
+    uint32_t m_caps3{0};
+    uint32_t m_caps4{0};
+    uint32_t m_reserved2{0};
 };
 
-enum eDX10PixelFormat {
+enum eDX10PixelFormat : uint32_t {
     DX10_UNKNOWN = 0,
     DX10_R32G32B32A32_TYPELESS = 1,
     DX10_R32G32B32A32_FLOAT = 2,
@@ -159,7 +159,7 @@ enum eDX10PixelFormat {
     DX10_V408 = 132,
 };
 
-enum eDX10ResourceDimmension {
+enum eDX10ResourceDimmension : uint32_t {
     UNKNOWN = 0,
     BUFFER = 1,
     TEXTURE1D = 2,
@@ -167,9 +167,9 @@ enum eDX10ResourceDimmension {
     TEXTURE3D = 4
 };
 struct sDX10Header {
-    eDX10PixelFormat m_dxgiFormat;
-    eDX10ResourceDimmension m_resourceDimension;
-    uint32_t m_miscFlag;
-    uint32_t m_arraySize;
-    uint32_t m_miscFlags2;
+    eDX10PixelFormat m_dxgiFormat{0};
+    eDX10ResourceDimmension m_resourceDimension{0};
+    uint32_t m_miscFlag{0};
+    uint32_t m_arraySize{0};
+    uint32_t m_miscFlags2{0};
 };

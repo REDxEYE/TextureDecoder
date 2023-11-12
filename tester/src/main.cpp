@@ -1,12 +1,9 @@
 #include <gtest/gtest.h>
-#include "dds/loadDDS.h"
-#include "png/loadPNG.h"
-#include "hdr/loadHDR.h"
+#include "dds/ddsSupport.h"
+#include "png/pngSupport.h"
+#include "hdr/hdrSupport.h"
 #include "texture.h"
 #include "textureDecoder.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-
 #include "stb_image.h"
 
 void assert_same(const sTexture *t, const sTexture *e, uint64_t c) {

@@ -6,7 +6,7 @@ int64_t calculate_texture_size_whpf(uint32_t width, uint32_t height, ePixelForma
     return calculateTextureSize(width, height, pixelFormat);
 }
 
-int64_t calculate_texture_size(sTexture *texture) {
+int64_t calculate_texture_size(const sTexture *texture) {
     return calculateTextureSize(texture);
 }
 
@@ -23,7 +23,7 @@ bool convert_texture(const sTexture *from_texture, sTexture *to_texture) {
     return convertTexture(from_texture, to_texture);
 }
 
-bool get_texture_data(sTexture *texture, char *buffer, uint32_t buffer_size) {
+bool get_texture_data(const sTexture *texture, char *buffer, uint32_t buffer_size) {
     if (calculateTextureSize(texture) < buffer_size) {
         return false;
     }
@@ -44,7 +44,7 @@ sTexture *load_dds(char *filename) {
     return nullptr;
 }
 
-sTexture *load_png(char *filename, int expected_channels) {
+sTexture *load_png(const char *filename, int expected_channels) {
     sTexture *texture = createTexture();
     if (loadPNG(filename, texture, expected_channels)) {
         return texture;
@@ -53,7 +53,12 @@ sTexture *load_png(char *filename, int expected_channels) {
     return nullptr;
 }
 
-sTexture *load_hdr(char *filename) {
+bool write_png(const char *filename, const sTexture *texture) {
+    return writePNG(filename, texture);
+}
+
+
+sTexture *load_hdr(const char *filename) {
     sTexture *texture = createTexture();
     if (loadHDR(filename, texture)) {
         return texture;
@@ -62,14 +67,15 @@ sTexture *load_hdr(char *filename) {
     return nullptr;
 }
 
-uint32_t get_texture_width(sTexture *texture) {
+uint32_t get_texture_width(const sTexture *texture) {
     return texture->m_width;
 }
 
-uint32_t get_texture_height(sTexture *texture) {
+uint32_t get_texture_height(const sTexture *texture) {
     return texture->m_height;
 }
 
-ePixelFormat get_texture_pixel_format(sTexture *texture) {
+ePixelFormat get_texture_pixel_format(const sTexture *texture) {
     return texture->m_pixelFormat;
 }
+

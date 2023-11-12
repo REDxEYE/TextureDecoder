@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "textureDecoder.h"
 #include <filesystem>
-#include "dds/dds.h"
+#include "dds/ddsDefs.h"
 
 bool loadDDS(const std::filesystem::path &filename, sTexture *texture);
 

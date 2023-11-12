@@ -2,7 +2,7 @@
 #include <fstream>
 #include <istream>
 
-#include "dds/loadDDS.h"
+#include "dds/ddsSupport.h"
 #include "texture.h"
 #include "logging.h"
 
