@@ -27,7 +27,7 @@ bool get_texture_data(sTexture *texture, char *buffer, uint32_t buffer_size) {
     if (calculateTextureSize(texture) < buffer_size) {
         return false;
     }
-    memcpy(buffer, texture->m_rawPixelData.data(), std::min(texture->m_rawPixelData.size(), (size_t) buffer_size));
+    memcpy(buffer, texture->m_rawPixelData.data(), texture->m_rawPixelData.size());
     return true;
 }
 
@@ -60,4 +60,16 @@ sTexture *load_hdr(char *filename) {
     }
     freeTexture(texture);
     return nullptr;
+}
+
+uint32_t get_texture_width(sTexture *texture) {
+    return texture->m_width;
+}
+
+uint32_t get_texture_height(sTexture *texture) {
+    return texture->m_height;
+}
+
+ePixelFormat get_texture_pixel_format(sTexture *texture) {
+    return texture->m_pixelFormat;
 }
