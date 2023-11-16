@@ -123,9 +123,9 @@ int getChannelCount(ePixelFormat pixelFormat) {
 }
 
 bool isCompressedPixelFormat(ePixelFormat pixelFormat) {
-    if (pixelFormat >= BC1)
-        return false;
-    return true;
+    if (pixelFormat >= ePixelFormat::BC1)
+        return true;
+    return false;
 }
 
 ePixelFormat getUncompressedPixelFormatVariant(ePixelFormat pixelFormat) {

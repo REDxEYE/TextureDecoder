@@ -13,11 +13,12 @@ void assert_same(const sTexture *t, const sTexture *e, uint64_t c) {
         ASSERT_EQ(t->m_rawPixelData[i], e->m_rawPixelData[i]) << "i=" << i;
     }
 }
+
 void assert_same_float(const sTexture *t, const sTexture *e, uint64_t c) {
     ASSERT_EQ(t->m_rawPixelData.size(), e->m_rawPixelData.size());
     ASSERT_EQ(t->m_pixelFormat, e->m_pixelFormat);
     for (uint64_t i = 0; i < e->m_width * e->m_height * c; ++i) {
-        ASSERT_NEAR(*(float*)&t->m_rawPixelData[i*4], *(float*)&e->m_rawPixelData[i*4],0.25) << "i=" << i;
+        ASSERT_NEAR(*(float *) &t->m_rawPixelData[i * 4], *(float *) &e->m_rawPixelData[i * 4], 0.25) << "i=" << i;
     }
 }
 
@@ -109,7 +110,6 @@ TEST(DDSTests, TestBC1) {
     assert_same(rgb888Texture, &eTexture, 3);
     freeTexture(rgb888Texture);
 }
-
 
 TEST(DDSTests, TestBC2) {
     sTexture texture;
@@ -291,7 +291,6 @@ TEST(DDSTests, TestDX10BC6UF16) {
     freeTexture(rg88Texture);
 }
 
-
 TEST(DDSTests, TestDX10BC6SF16) {
     sTexture texture;
     sTexture eTexture;
@@ -304,4 +303,19 @@ TEST(DDSTests, TestDX10BC6SF16) {
     ASSERT_TRUE(convertTexture(&texture, rg88Texture));
     assert_same_float(rg88Texture, &eTexture, 3);
     freeTexture(rg88Texture);
+}
+
+TEST(Library, TestIsCompressedFormat) {
+    ASSERT_TRUE(isCompressedPixelFormat(ePixelFormat::BC1));
+    ASSERT_TRUE(isCompressedPixelFormat(ePixelFormat::BC1a));
+    ASSERT_TRUE(isCompressedPixelFormat(ePixelFormat::BC2));
+    ASSERT_TRUE(isCompressedPixelFormat(ePixelFormat::BC3));
+    ASSERT_TRUE(isCompressedPixelFormat(ePixelFormat::BC4));
+    ASSERT_TRUE(isCompressedPixelFormat(ePixelFormat::BC5));
+    ASSERT_TRUE(isCompressedPixelFormat(ePixelFormat::BC6));
+    ASSERT_TRUE(isCompressedPixelFormat(ePixelFormat::BC7));
+    for (uint32_t i = ePixelFormat::RGBA32; i < ePixelFormat::RGBA1010102; i++) {
+        ASSERT_FALSE(isCompressedPixelFormat(ePixelFormat(i)))
+                                    << "Checking " << getPixelFormatName(ePixelFormat(i)) << "\n";
+    }
 }
