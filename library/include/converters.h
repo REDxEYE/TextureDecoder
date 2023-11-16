@@ -1,9 +1,9 @@
 #pragma once
 
 #include <unordered_map>
-#include "textureDecoder.h"
+#include "textureApi.h"
 
-#define MAKE_PIXEL_PAIR(e1, e2) ((uint32_t)e1|((uint32_t)e2)<<16)
+#define MAKE_PIXEL_PAIR(e1, e2) ((uint32_t)(e1)|((uint32_t)(e2))<<16)
 
 typedef bool (*tConverterFn)(const sTexture *fromTexture, sTexture *toTexture);
 
@@ -50,9 +50,18 @@ bool convertBC4toR8(const sTexture *fromTexture, sTexture *toTexture);
 bool convertBC5toRG88(const sTexture *fromTexture, sTexture *toTexture);
 
 bool convertBC6toRGB16F(const sTexture *fromTexture, sTexture *toTexture);
+
 bool convertBC6toRGB32F(const sTexture *fromTexture, sTexture *toTexture);
 
 bool convertBC7toRGBA8888(const sTexture *fromTexture, sTexture *toTexture);
+
+bool convertRGBA8888toBGRA8888(const sTexture *fromTexture, sTexture *toTexture);
+
+bool convertBGRA8888toRGBA8888(const sTexture *fromTexture, sTexture *toTexture);
+
+bool convertRG16toRG88(const sTexture *fromTexture, sTexture *toTexture);
+
+bool convertRGBA1010102toRGBA8888(const sTexture *fromTexture, sTexture *toTexture);
 
 #define DEFINE_CONVERTER(fromFmt, toFmt) {MAKE_PIXEL_PAIR(fromFmt, toFmt), convert##fromFmt##to##toFmt}
 
@@ -60,6 +69,9 @@ bool convertBC7toRGBA8888(const sTexture *fromTexture, sTexture *toTexture);
 
 static std::unordered_map<uint32_t, tConverterFn> cConverters{
         DEFINE_CONVERTER(RGBA8888, RGBA8888),
+        DEFINE_CONVERTER(RG16, RG88),
+        DEFINE_CONVERTER(RGBA1010102, RGBA8888),
+        DEFINE_TWO_WAY_CONVERTER(RGBA8888, BGRA8888),
         DEFINE_TWO_WAY_CONVERTER(RGB888, RGBA8888),
         DEFINE_TWO_WAY_CONVERTER(RGB16F, RGB32F),
         DEFINE_TWO_WAY_CONVERTER(R8, RG88),

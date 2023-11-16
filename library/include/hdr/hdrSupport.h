@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <filesystem>
-#include "textureDecoder.h"
+#include "textureApi.h"
 
 bool loadHDR(uint8_t *data, size_t dataSize, sTexture *texture);
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "pixelFormats.h"
+#include "pixelFormat.h"
 
 struct sTexture {
     std::vector<uint8_t> m_rawPixelData;

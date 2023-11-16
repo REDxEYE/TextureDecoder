@@ -3,7 +3,7 @@
 #include "png/pngSupport.h"
 #include "hdr/hdrSupport.h"
 #include "texture.h"
-#include "textureDecoder.h"
+#include "textureApi.h"
 #include "stb_image.h"
 
 void assert_same(const sTexture *t, const sTexture *e, uint64_t c) {
@@ -23,8 +23,8 @@ void assert_same_float(const sTexture *t, const sTexture *e, uint64_t c) {
 
 TEST(DDSTests, TestR8) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/mode-l.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/mode-l.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/mode-l.png", &eTexture, 1));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -34,8 +34,8 @@ TEST(DDSTests, TestR8) {
 
 TEST(DDSTests, TestRA88) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/mode-la.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/mode-la.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/mode-la.png", &eTexture, 2));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -45,8 +45,8 @@ TEST(DDSTests, TestRA88) {
 
 TEST(DDSTests, TestRGB888) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/mode-rgb.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/mode-rgb.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/mode-rgb.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -56,8 +56,8 @@ TEST(DDSTests, TestRGB888) {
 
 TEST(DDSTests, TestRGBA8888) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/mode-rgba.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/mode-rgba.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/mode-rgba.png", &eTexture, 4));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -67,8 +67,8 @@ TEST(DDSTests, TestRGBA8888) {
 
 TEST(DDSTests, TestRGBA8888ToRGB888) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/mode-rgba.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/mode-rgba.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/mode-rgb.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -81,8 +81,8 @@ TEST(DDSTests, TestRGBA8888ToRGB888) {
 
 TEST(DDSTests, TestRGB888ToRGBA8888) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/mode-rgb.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/mode-rgb.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/mode-rgb.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -98,8 +98,8 @@ TEST(DDSTests, TestRGB888ToRGBA8888) {
 
 TEST(DDSTests, TestBC1) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/dxt1-rgb-4bbp-noalpha_MipMaps-1.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/dxt1-rgb-4bbp-noalpha_MipMaps-1.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/dxt1-rgb-4bbp-noalpha_MipMaps-1.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -113,8 +113,8 @@ TEST(DDSTests, TestBC1) {
 
 TEST(DDSTests, TestBC2) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/dxt3-argb-8bbp-explicitalpha_MipMaps-1.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/dxt3-argb-8bbp-explicitalpha_MipMaps-1.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/dxt3-argb-8bbp-explicitalpha_MipMaps-1.png", &eTexture, 4));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -127,8 +127,8 @@ TEST(DDSTests, TestBC2) {
 
 TEST(DDSTests, TestBC3) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/dxt5-argb-8bbp-interpolatedalpha_MipMaps-1.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/dxt5-argb-8bbp-interpolatedalpha_MipMaps-1.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/dxt5-argb-8bbp-interpolatedalpha_MipMaps-1.png", &eTexture, 4));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -141,8 +141,8 @@ TEST(DDSTests, TestBC3) {
 
 TEST(DDSTests, TestBC4) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/ati1.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/ati1.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/ati1.png", &eTexture, 1));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -169,8 +169,8 @@ TEST(DDSTests, TestBC4U) {
 
 TEST(DDSTests, TestBC5) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/ati2.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/ati2.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/ati2.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -186,8 +186,8 @@ TEST(DDSTests, TestBC5) {
 
 TEST(DDSTests, TestDX10BC5Snorm) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/bc5_snorm.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/bc5_snorm.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/bc5_snorm.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -203,8 +203,8 @@ TEST(DDSTests, TestDX10BC5Snorm) {
 
 TEST(DDSTests, TestDX10BC5Typeless) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/bc5_typeless.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/bc5_typeless.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/bc5_typeless.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -220,8 +220,8 @@ TEST(DDSTests, TestDX10BC5Typeless) {
 
 TEST(DDSTests, TestDX10BC5Unorm) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/bc5_unorm.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/bc5_unorm.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/bc5_unorm.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -237,8 +237,8 @@ TEST(DDSTests, TestDX10BC5Unorm) {
 
 TEST(DDSTests, TestDX10BC1Unorm) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/bc1.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/bc1.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/bc1.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -251,8 +251,8 @@ TEST(DDSTests, TestDX10BC1Unorm) {
 
 TEST(DDSTests, TestDX10BC1Typeless) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/bc1_typeless.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/bc1_typeless.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/bc1_typeless.png", &eTexture, 3));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -265,8 +265,8 @@ TEST(DDSTests, TestDX10BC1Typeless) {
 
 TEST(DDSTests, TestDX10BC7Unorm) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/bc7-argb-8bpp_MipMaps-1.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/bc7-argb-8bpp_MipMaps-1.dds", &texture));
     ASSERT_TRUE(loadPNG("test_data/bc7-argb-8bpp_MipMaps-1.png", &eTexture, 4));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -279,8 +279,8 @@ TEST(DDSTests, TestDX10BC7Unorm) {
 
 TEST(DDSTests, TestDX10BC6UF16) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/source.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/source.dds", &texture));
     ASSERT_TRUE(loadHDR("test_data/source.hdr", &eTexture));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);
@@ -294,8 +294,8 @@ TEST(DDSTests, TestDX10BC6UF16) {
 
 TEST(DDSTests, TestDX10BC6SF16) {
     sTexture texture;
-    ASSERT_TRUE(loadDDS("test_data/bc6h_sf.dds", &texture));
     sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/bc6h_sf.dds", &texture));
     ASSERT_TRUE(loadHDR("test_data/bc6h_sf.hdr", &eTexture));
     ASSERT_EQ(texture.m_width, eTexture.m_width);
     ASSERT_EQ(texture.m_height, eTexture.m_height);

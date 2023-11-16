@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdint>
 
 enum ePixelFormat : uint16_t {
@@ -20,12 +21,14 @@ enum ePixelFormat : uint16_t {
     RG16F,
     R16F,
     RGBA8888,
+    BGRA8888,
     RGB888,
     RG88,
     RA88,
     R8,
     RGB565,
     RGBA5551,
+    RGBA1010102,
     BC1,
     BC1a,
     BC2,
@@ -34,9 +37,13 @@ enum ePixelFormat : uint16_t {
     BC5,
     BC6,
     BC7
-
 };
 
 const char *getPixelFormatName(ePixelFormat pixelFormat);
 
-int getChannelCount(ePixelFormat format);
+int getChannelCount(ePixelFormat pixelFormat);
+int getPixelFormatPixelSize(ePixelFormat pixelFormat);
+
+bool isCompressedPixelFormat(ePixelFormat pixelFormat);
+
+ePixelFormat getUncompressedPixelFormatVariant(ePixelFormat pixelFormat);

@@ -7,9 +7,10 @@
 #include "logging.h"
 #include "fileAbstraction.h"
 
-bool loadTGA(const std::filesystem::path& filename, sTexture *texture, uint8_t expectedChannels) {
+bool loadTGA(const std::filesystem::path &filename, sTexture *texture, uint8_t expectedChannels) {
     int realChannelCount;
-    uint8_t *data = stbi_load(filename.string().c_str(), (int *) &texture->m_width, (int *) &texture->m_height, &realChannelCount, 0);
+    uint8_t *data = stbi_load(filename.string().c_str(), (int *) &texture->m_width, (int *) &texture->m_height,
+                              &realChannelCount, 0);
     if (data == nullptr) {
         texture->m_pixelFormat = ePixelFormat::INVALID;
         return false;
@@ -34,8 +35,7 @@ bool loadTGA(const std::filesystem::path& filename, sTexture *texture, uint8_t e
     }
 
     texture->m_pixelFormat = ePixelFormat::RGBA8888;
-    texture->m_rawPixelData.resize(calculateTextureSize(texture));
-    memcpy(texture->m_rawPixelData.data(), data, texture->m_rawPixelData.size());
+    texture->m_rawPixelData.assign(data, data + calculateTextureSize(texture));
     stbi_image_free(data);
     loggerEx(eLogLevel::INFO, std::format("Loaded TGA {}x{} {}\n", texture->m_width, texture->m_height,
                                           getPixelFormatName(texture->m_pixelFormat)));
@@ -45,8 +45,8 @@ bool loadTGA(const std::filesystem::path& filename, sTexture *texture, uint8_t e
 bool loadTGA(uint8_t *data, size_t dataSize, sTexture *texture, uint8_t expectedChannels) {
     int realChannelCount;
     uint8_t *iData = stbi_load_from_memory(data, dataSize, (int *) &texture->m_width,
-                                                          (int *) &texture->m_height, &realChannelCount,
-                                                          0);
+                                           (int *) &texture->m_height, &realChannelCount,
+                                           0);
     if (iData == nullptr) {
         texture->m_pixelFormat = ePixelFormat::INVALID;
         return false;
@@ -71,8 +71,7 @@ bool loadTGA(uint8_t *data, size_t dataSize, sTexture *texture, uint8_t expected
     }
 
     texture->m_pixelFormat = ePixelFormat::RGBA8888;
-    texture->m_rawPixelData.resize(calculateTextureSize(texture));
-    memcpy(texture->m_rawPixelData.data(), iData, texture->m_rawPixelData.size());
+    texture->m_rawPixelData.assign(iData, iData + calculateTextureSize(texture));
     loggerEx(eLogLevel::INFO, std::format("Loaded TGA {}x{} {}\n", texture->m_width, texture->m_height,
                                           getPixelFormatName(texture->m_pixelFormat)));
     return true;
@@ -113,10 +112,10 @@ bool writeTGA(const std::filesystem::path &filename, const sTexture *texture) {
             loggerEx(eLogLevel::ERROR, "Failed to save TGA\n");
             return false;
         }
-        texture = tmpTexture;
-
+        bool res = writeTGA(filename, tmpTexture);
+        freeTexture(tmpTexture);
+        return res;
     }
-
 
     FILE *file = openFile(filename, "wb");
     if (!file) {

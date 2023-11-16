@@ -1,10 +1,11 @@
 #include <cstring>
-#include "api.h"
+#include "publicApi.h"
 #include "texture.h"
 #include "dds/ddsSupport.h"
 #include "png/pngSupport.h"
 #include "hdr/hdrSupport.h"
 #include "tga/tgaSupport.h"
+#include "pixelFormat.h"
 
 int64_t get_buffer_size_from_texture_format(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
     return calculateTextureSize(width, height, pixelFormat);
@@ -12,6 +13,10 @@ int64_t get_buffer_size_from_texture_format(uint32_t width, uint32_t height, ePi
 
 int64_t get_buffer_size_from_texture(const sTexture *texture) {
     return calculateTextureSize(texture);
+}
+
+bool is_compressed_pixel_format(ePixelFormat pixelFormat) {
+    return isCompressedPixelFormat(pixelFormat);
 }
 
 sTexture *
@@ -94,5 +99,9 @@ uint32_t get_texture_height(const sTexture *texture) {
 
 ePixelFormat get_texture_pixel_format(const sTexture *texture) {
     return texture->m_pixelFormat;
+}
+
+bool flip_texture(const sTexture *in_texture, sTexture *out_texture, bool flip_ud, bool flip_lr) {
+    return flipTexture(in_texture, out_texture, flip_ud, flip_lr);
 }
 

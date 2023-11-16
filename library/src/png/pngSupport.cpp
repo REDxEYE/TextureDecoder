@@ -21,6 +21,7 @@ bool loadPNG(const fs::path &filename, sTexture *texture, uint8_t expectedChanne
     if (data == nullptr) {
         return false;
     }
+    fclose(file);
     if (expectedChannels == 0) {
         expectedChannels = realChannelCount;
     }
@@ -39,8 +40,7 @@ bool loadPNG(const fs::path &filename, sTexture *texture, uint8_t expectedChanne
             texture->m_pixelFormat = ePixelFormat::RGBA8888;
             break;
     }
-    texture->m_rawPixelData.resize(calculateTextureSize(texture));
-    memcpy(texture->m_rawPixelData.data(), data, texture->m_rawPixelData.size());
+    texture->m_rawPixelData.assign(data, data + calculateTextureSize(texture));
     stbi_image_free(data);
     loggerEx(eLogLevel::INFO, std::format("Loaded PNG {}x{} {}\n", texture->m_width, texture->m_height,
                                           getPixelFormatName(texture->m_pixelFormat)));
@@ -49,7 +49,8 @@ bool loadPNG(const fs::path &filename, sTexture *texture, uint8_t expectedChanne
 
 bool loadPNG(uint8_t *data, size_t dataSize, sTexture *texture, uint8_t expectedChannels) {
     int realChannelCount;
-    uint8_t *iData = stbi_load_from_memory(data, dataSize, (int *) &texture->m_width, (int *) &texture->m_height, &realChannelCount,
+    uint8_t *iData = stbi_load_from_memory(data, dataSize, (int *) &texture->m_width, (int *) &texture->m_height,
+                                           &realChannelCount,
                                            expectedChannels);
     if (iData == nullptr) {
         texture->m_pixelFormat = ePixelFormat::INVALID;
@@ -73,8 +74,7 @@ bool loadPNG(uint8_t *data, size_t dataSize, sTexture *texture, uint8_t expected
             texture->m_pixelFormat = ePixelFormat::RGBA8888;
             break;
     }
-    texture->m_rawPixelData.resize(calculateTextureSize(texture));
-    memcpy(texture->m_rawPixelData.data(), iData, texture->m_rawPixelData.size());
+    texture->m_rawPixelData.assign(iData, iData + calculateTextureSize(texture));
     loggerEx(eLogLevel::INFO, std::format("Loaded PNG {}x{} {}\n", texture->m_width, texture->m_height,
                                           getPixelFormatName(texture->m_pixelFormat)));
     return true;
@@ -115,7 +115,9 @@ bool writePNG(const std::filesystem::path &filename, const sTexture *texture) {
             loggerEx(eLogLevel::ERROR, "Failed to save PNG\n");
             return false;
         }
-        texture = tmpTexture;
+        bool res = writePNG(filename, tmpTexture);
+        freeTexture(tmpTexture);
+        return res;
 
     }
 

@@ -31,6 +31,7 @@ bool loadDDS(const fs::path &filename, sTexture *texture) {
     }
 
     bool res = loadDDS(data.data(), fsize, texture);
+    file.close();
     return res;
 }
 
@@ -123,8 +124,7 @@ bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
             }
         }
     } else {
-
-        memcpy(texture->m_rawPixelData.data(), data, pixelDataSize);
+        texture->m_rawPixelData.assign(data, data + pixelDataSize);
     }
     loggerEx(eLogLevel::INFO, std::format("Loaded DDS {}x{} {}\n", texture->m_width, texture->m_height,
                                           getPixelFormatName(texture->m_pixelFormat)));

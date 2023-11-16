@@ -1,5 +1,5 @@
 #include "stb_image_write.h"
-#include "textureDecoder.h"
+#include "textureApi.h"
 #include "dds/ddsSupport.h"
 #include "texture.h"
 #include "logging.h"

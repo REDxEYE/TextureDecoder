@@ -7,17 +7,16 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(libs/argparse)
 
 set(TextureDecoderSrc
-        library/src/textureDecoder.cpp
+        library/src/textureApi.cpp
         library/src/converters.cpp
         library/src/dds/ddsSupport.cpp
         library/src/png/pngSupport.cpp
         library/src/hdr/hdrSupport.cpp
         library/src/tga/tgaSupport.cpp
-        library/src/rgb.cpp
-        library/src/block_compression.cpp
+        library/src/blockCompression.cpp
         library/src/stb.cpp
         libs/half/half.cpp
-        library/src/api.cpp
+        library/src/publicApi.cpp
         library/src/logging.cpp
         library/src/fileAbstraction.cpp
         library/src/pixelFormat.cpp
@@ -34,7 +33,7 @@ add_executable(
         converter/src/main.cpp
         converter/src/main.cpp
         library/src/png/pngSupport.cpp
-        library/include/api.h)
+        library/include/publicApi.h)
 target_link_libraries(
         converter
         TextureDecoderStatic

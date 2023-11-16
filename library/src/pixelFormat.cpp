@@ -1,4 +1,4 @@
-#include "pixelFormats.h"
+#include "pixelFormat.h"
 
 const char *getPixelFormatName(ePixelFormat pixelFormat) {
     switch (pixelFormat) {
@@ -38,6 +38,8 @@ const char *getPixelFormatName(ePixelFormat pixelFormat) {
             return "R16F";
         case RGBA8888:
             return "RGBA8888";
+        case BGRA8888:
+            return "BGRA8888";
         case RGB888:
             return "RGB888";
         case RG88:
@@ -50,6 +52,8 @@ const char *getPixelFormatName(ePixelFormat pixelFormat) {
             return "RGB565";
         case RGBA5551:
             return "RGBA5551";
+        case RGBA1010102:
+            return "RGBA1010102";
         case BC1:
             return "BC1";
         case BC1a:
@@ -69,14 +73,16 @@ const char *getPixelFormatName(ePixelFormat pixelFormat) {
     }
 }
 
-int getChannelCount(ePixelFormat format) {
-    switch (format) {
+int getChannelCount(ePixelFormat pixelFormat) {
+    switch (pixelFormat) {
         case RGBA32:
         case RGBA32F:
         case RGBA8888:
+        case BGRA8888:
         case RGBA16:
         case RGBA16F:
         case RGBA5551:
+        case RGBA1010102:
         case BC1a:
         case BC2:
         case BC3:
@@ -116,3 +122,85 @@ int getChannelCount(ePixelFormat format) {
     }
 }
 
+bool isCompressedPixelFormat(ePixelFormat pixelFormat) {
+    if (pixelFormat >= BC1)
+        return false;
+    return true;
+}
+
+ePixelFormat getUncompressedPixelFormatVariant(ePixelFormat pixelFormat) {
+    switch (pixelFormat) {
+        default:
+            return pixelFormat;
+        case BC1:
+        case BC1a:
+        case BC2:
+        case BC3:
+        case BC7:
+            return RGBA8888;
+        case BC4:
+            return R8;
+        case BC5:
+            return RG88;
+        case BC6:
+            return RGB16F;
+    }
+}
+
+int getPixelFormatPixelSize(ePixelFormat pixelFormat) {
+    switch (pixelFormat) {
+        default:
+        case INVALID:
+            return 0;
+        case RGBA32:
+            return 16;
+        case RGB32:
+            return 12;
+        case RG32:
+            return 8;
+        case R32:
+            return 4;
+        case RGBA16:
+            return 8;
+        case RGB16:
+            return 6;
+        case RG16:
+            return 4;
+        case R16:
+            return 2;
+        case RGBA32F:
+            return 16;
+        case RGB32F:
+            return 12;
+        case RG32F:
+            return 8;
+        case R32F:
+            return 4;
+        case RGBA16F:
+            return 8;
+        case RGB16F:
+            return 6;
+        case RG16F:
+            return 4;
+        case R16F:
+            return 2;
+        case RGBA8888:
+            return 4;
+        case BGRA8888:
+            return 4;
+        case RGB888:
+            return 3;
+        case RG88:
+            return 2;
+        case RA88:
+            return 2;
+        case R8:
+            return 1;
+        case RGB565:
+            return 2;
+        case RGBA5551:
+            return 2;
+        case RGBA1010102:
+            return 4;
+    }
+}

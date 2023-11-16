@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "textureDecoder.h"
+#include "textureApi.h"
 #include <filesystem>
 #include "dds/ddsDefs.h"
 
