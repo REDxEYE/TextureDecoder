@@ -109,3 +109,7 @@ bool flip_texture(const sTexture *in_texture, sTexture *out_texture, bool flip_u
     return flipTexture(in_texture, out_texture, flip_ud, flip_lr);
 }
 
+ePixelFormat get_uncompressed_pixel_format_variant(ePixelFormat pixelFormat) {
+    return getUncompressedPixelFormatVariant(pixelFormat);
+}
+
