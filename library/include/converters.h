@@ -61,6 +61,8 @@ bool convertBGRA8888toRGBA8888(const sTexture *fromTexture, sTexture *toTexture)
 
 bool convertRG16toRG88(const sTexture *fromTexture, sTexture *toTexture);
 
+bool convertR16toR8(const sTexture *fromTexture, sTexture *toTexture);
+
 bool convertRG16_SIGNEDtoRG16(const sTexture *fromTexture, sTexture *toTexture);
 
 bool convertRGBA1010102toRGBA8888(const sTexture *fromTexture, sTexture *toTexture);
@@ -72,6 +74,7 @@ bool convertRGBA1010102toRGBA8888(const sTexture *fromTexture, sTexture *toTextu
 static std::unordered_map<uint32_t, tConverterFn> cConverters{
         DEFINE_CONVERTER(RGBA8888, RGBA8888),
         DEFINE_CONVERTER(RG16, RG88),
+        DEFINE_CONVERTER(R16, R8),
         DEFINE_CONVERTER(RG16_SIGNED, RG16), // Remap signed to unsigned
         DEFINE_CONVERTER(RGBA1010102, RGBA8888),
         DEFINE_TWO_WAY_CONVERTER(RGBA8888, BGRA8888),

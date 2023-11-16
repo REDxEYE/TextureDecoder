@@ -362,14 +362,14 @@ bool convertRGBA1010102toRGBA8888(const sTexture *fromTexture, sTexture *toTextu
     toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
     for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
         uint32_t pixel =
-                ((uint32_t) fromTexture->m_rawPixelData[i * 4 + 0] << 24) |
-                ((uint32_t) fromTexture->m_rawPixelData[i * 4 + 1] << 16) |
-                ((uint32_t) fromTexture->m_rawPixelData[i * 4 + 2] << 8) |
-                ((uint32_t) fromTexture->m_rawPixelData[i * 4 + 3]);
-        uint16_t red = (pixel >> 22) & 0x3FF;
-        uint16_t green = (pixel >> 12) & 0x3FF;
-        uint16_t blue = (pixel >> 2) & 0x3FF;
-        uint16_t alpha = pixel & 0x3;
+                ((uint32_t) fromTexture->m_rawPixelData[i * 4 + 3] << 24) |
+                ((uint32_t) fromTexture->m_rawPixelData[i * 4 + 2] << 16) |
+                ((uint32_t) fromTexture->m_rawPixelData[i * 4 + 1] << 8) |
+                ((uint32_t) fromTexture->m_rawPixelData[i * 4 + 0]);
+        uint16_t red = (pixel >> 0) & 0x3FF;
+        uint16_t green = (pixel >> 10) & 0x3FF;
+        uint16_t blue = (pixel >> 20) & 0x3FF;
+        uint16_t alpha = (pixel>>30) & 0x3;
 
         red = red * 256 / 1023;
         green = green * 256 / 1023;
@@ -392,6 +392,16 @@ bool convertRG16_SIGNEDtoRG16(const sTexture *fromTexture, sTexture *toTexture) 
     for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
         toData[i * 2 + 0] = static_cast<uint16_t>(fromData[i * 2 + 0] + 32768);
         toData[i * 2 + 1] = static_cast<uint16_t>(fromData[i * 2 + 1] + 32768);
+    }
+    return true;
+}
+
+bool convertR16toR8(const sTexture *fromTexture, sTexture *toTexture) {
+    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
+    const uint16_t *fromData = reinterpret_cast<const uint16_t *>(fromTexture->m_rawPixelData.data());
+    for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
+
+        toTexture->m_rawPixelData[i] = (uint8_t) (fromData[i] >> 8);
     }
     return true;
 }

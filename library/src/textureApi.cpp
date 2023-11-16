@@ -71,6 +71,7 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
     // Direct copy if pixel formats are the same
     if (fromTexture->m_pixelFormat == toTexture->m_pixelFormat) {
         toTexture->m_rawPixelData.assign(fromTexture->m_rawPixelData.begin(), fromTexture->m_rawPixelData.end());
+        return true;
     }
 
     // Key for the converter map based on source and target formats

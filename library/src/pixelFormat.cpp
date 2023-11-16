@@ -73,6 +73,7 @@ const char *getPixelFormatName(ePixelFormat pixelFormat) {
         case BC7:
             return "BC7";
     }
+    return "NO_NAME";
 }
 
 int getChannelCount(ePixelFormat pixelFormat) {
