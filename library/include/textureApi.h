@@ -48,7 +48,7 @@ sTexture *createTexture(uint32_t width, uint32_t height, ePixelFormat pixelForma
  * Flips a given texture either vertically, horizontally, or both, and writes the result to an output texture.
  *
  * @param inTexture A pointer to the source texture to flip.
- * @param outTexture A pointer to the destination texture where the flipped result will be stored.
+ * @param outTexture A pointer to the destination texture where the flipped result will be stored. **!!RE-INITIALIZED INSIDE!!**
  * @param flipUD A boolean flag indicating whether to flip the texture upside down (vertically).
  * @param flipLR A boolean flag indicating whether to flip the texture left to right (horizontally).
  * @return A boolean value indicating the success or failure of the operation.

@@ -233,14 +233,6 @@ bool flipTexture(const sTexture *inTexture, sTexture *outTexture, bool flipUD, b
         return false;
     }
 
-    // Check if the pixel formats of the input and output textures match
-    if (inTexture->m_pixelFormat != outTexture->m_pixelFormat) {
-        loggerEx(eLogLevel::ERROR, std::format("Input({}) and output({}) texture formats do not match!",
-                                               getPixelFormatName(inTexture->m_pixelFormat),
-                                               getPixelFormatName(outTexture->m_pixelFormat)));
-        return false;
-    }
-
     // Handle compressed pixel formats by converting to an uncompressed variant
     if (isCompressedPixelFormat(inTexture->m_pixelFormat)) {
         loggerEx(eLogLevel::INFO,
@@ -257,6 +249,8 @@ bool flipTexture(const sTexture *inTexture, sTexture *outTexture, bool flipUD, b
         freeTexture(tmpTexture);
         return res;
     }
+
+    initTexture(outTexture,inTexture->m_width,inTexture->m_height,inTexture->m_pixelFormat);
 
     uint32_t width = inTexture->m_width;
     uint32_t height = inTexture->m_height;
