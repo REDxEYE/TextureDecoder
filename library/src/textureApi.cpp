@@ -18,7 +18,7 @@ sTexture *createTexture() {
 
 sTexture *createTexture(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
     sTexture *texture = new sTexture();
-    initTexture(texture, height, width, pixelFormat);
+    initTexture(texture, width, height, pixelFormat);
     return texture;
 }
 
@@ -229,14 +229,14 @@ int64_t calculateTextureSize(uint32_t width, uint32_t height, ePixelFormat pixel
 bool flipTexture(const sTexture *inTexture, sTexture *outTexture, bool flipUD, bool flipLR) {
     // Validate input and output textures
     if (!inTexture || !outTexture) {
-        loggerEx(eLogLevel::ERROR, "Input or output texture is nullptr!");
+        loggerEx(eLogLevel::ERROR, "Input or output texture is nullptr!\n");
         return false;
     }
 
     // Handle compressed pixel formats by converting to an uncompressed variant
     if (isCompressedPixelFormat(inTexture->m_pixelFormat)) {
         loggerEx(eLogLevel::INFO,
-                 std::format("Cannot flip compressed format({}) directly, converting to compatible format({}).",
+                 std::format("Cannot flip compressed format({}) directly, converting to compatible format({}).\n",
                              getPixelFormatName(inTexture->m_pixelFormat),
                              getPixelFormatName(getUncompressedPixelFormatVariant(inTexture->m_pixelFormat))));
         sTexture *tmpTexture = createTexture(inTexture->m_width, inTexture->m_height,
