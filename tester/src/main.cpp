@@ -14,6 +14,17 @@ void assert_same(const sTexture *t, const sTexture *e, uint64_t c) {
     }
 }
 
+void assert_almost_same(const sTexture *t, const sTexture *e, uint64_t c, uint32_t max_error) {
+    ASSERT_EQ(t->m_rawPixelData.size(), e->m_rawPixelData.size());
+    ASSERT_EQ(t->m_pixelFormat, e->m_pixelFormat);
+    for (uint64_t i = 0; i < e->m_width * e->m_height * c; ++i) {
+        if(std::abs(t->m_rawPixelData[i] - e->m_rawPixelData[i])> max_error){
+            int i = 1;
+        }
+        ASSERT_LE(std::abs(t->m_rawPixelData[i] - e->m_rawPixelData[i]), max_error) << "i=" << i;
+    }
+}
+
 void assert_same_float(const sTexture *t, const sTexture *e, uint64_t c) {
     ASSERT_EQ(t->m_rawPixelData.size(), e->m_rawPixelData.size());
     ASSERT_EQ(t->m_pixelFormat, e->m_pixelFormat);
@@ -303,6 +314,24 @@ TEST(DDSTests, TestDX10BC6SF16) {
     ASSERT_TRUE(convertTexture(&texture, rg88Texture));
     assert_same_float(rg88Texture, &eTexture, 3);
     freeTexture(rg88Texture);
+}
+
+TEST(DDSTests, TestDX10RG16) {
+    sTexture texture;
+    sTexture eTexture;
+    ASSERT_TRUE(loadDDS("test_data/finalmm1616m00.dds", &texture));
+    ASSERT_TRUE(loadPNG("test_data/finalmm1616m00.png", &eTexture, 0));
+    ASSERT_EQ(texture.m_width, eTexture.m_width);
+    ASSERT_EQ(texture.m_height, eTexture.m_height);
+    ASSERT_EQ(texture.m_pixelFormat, ePixelFormat::RG16_SIGNED);
+    sTexture *rgba8888Texture = createTexture(eTexture.m_width, eTexture.m_height, ePixelFormat::RG88);
+    sTexture *ergba8888Texture = createTexture(eTexture.m_width, eTexture.m_height, ePixelFormat::RG88);
+    ASSERT_TRUE(convertTexture(&texture, rgba8888Texture));
+    ASSERT_TRUE(convertTexture(&eTexture, ergba8888Texture));
+    writePNG("test_data/finalmm1616m002.png", rgba8888Texture);
+    assert_almost_same(rgba8888Texture, ergba8888Texture, 2, 1);
+    freeTexture(rgba8888Texture);
+    freeTexture(ergba8888Texture);
 }
 
 TEST(Library, TestIsCompressedFormat) {

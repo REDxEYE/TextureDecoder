@@ -18,6 +18,8 @@ const char *getPixelFormatName(ePixelFormat pixelFormat) {
             return "RGB16";
         case RG16:
             return "RG16";
+        case RG16_SIGNED:
+            return "RG16_SIGNED";
         case R16:
             return "R16";
         case RGBA32F:
@@ -103,6 +105,7 @@ int getChannelCount(ePixelFormat pixelFormat) {
         case RG32F:
         case RG88:
         case RG16:
+        case RG16_SIGNED:
         case RG16F:
         case RA88:
         case BC4:
@@ -165,6 +168,7 @@ int getPixelFormatPixelSize(ePixelFormat pixelFormat) {
         case RGB16:
             return 6;
         case RG16:
+        case RG16_SIGNED:
             return 4;
         case R16:
             return 2;

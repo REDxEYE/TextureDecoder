@@ -87,12 +87,6 @@ bool writeTGA(const std::filesystem::path &filename, const sTexture *texture) {
                 "Input format({}) for TGA isn't an RGBA8888/RGB888/RG88/R8. Will convert it to compatible format\n",
                 getPixelFormatName(texture->m_pixelFormat)));
         ePixelFormat tmpPixelFormat = ePixelFormat::RGBA8888;
-        loggerEx(eLogLevel::DEBUG, std::format("Converting {} texture with {} channels to {} with {} channels\n",
-                                               getPixelFormatName(texture->m_pixelFormat),
-                                               getChannelCount(texture->m_pixelFormat),
-                                               getPixelFormatName(tmpPixelFormat),
-                                               getChannelCount(tmpPixelFormat)
-        ));
         switch (getChannelCount(texture->m_pixelFormat)) {
             case 4:
                 tmpPixelFormat = ePixelFormat::RGBA8888;
@@ -107,6 +101,12 @@ bool writeTGA(const std::filesystem::path &filename, const sTexture *texture) {
                 tmpPixelFormat = ePixelFormat::R8;
                 break;
         }
+        loggerEx(eLogLevel::DEBUG, std::format("Converting {} texture with {} channels to {} with {} channels\n",
+                                               getPixelFormatName(texture->m_pixelFormat),
+                                               getChannelCount(texture->m_pixelFormat),
+                                               getPixelFormatName(tmpPixelFormat),
+                                               getChannelCount(tmpPixelFormat)
+        ));
         sTexture *tmpTexture = createTexture(texture->m_width, texture->m_height, tmpPixelFormat);
         if (!convertTexture(texture, tmpTexture)) {
             loggerEx(eLogLevel::ERROR, "Failed to save TGA\n");

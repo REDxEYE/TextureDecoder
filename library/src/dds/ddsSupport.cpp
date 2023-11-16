@@ -175,6 +175,14 @@ void setTextureFormatInfo(sDDSHeader *header, sTexture *texture) {
             case MAKE_FOURCC('D', 'X', '1', '0'): {
                 sDX10Header *dx10Header = (sDX10Header *) (((uint8_t *) header) + sizeof(sDDSHeader));
                 switch (dx10Header->m_dxgiFormat) {
+                    case DX10_R16G16_UINT:
+                    case DX10_R16G16_UNORM:
+                        texture->m_pixelFormat = ePixelFormat::RG16;
+                        break;
+                    case DX10_R16G16_SINT:
+                    case DX10_R16G16_SNORM:
+                        texture->m_pixelFormat = ePixelFormat::RG16_SIGNED;
+                        break;
                     case DX10_BC1_TYPELESS:
                     case DX10_BC1_UNORM:
                     case DX10_BC1_UNORM_SRGB:

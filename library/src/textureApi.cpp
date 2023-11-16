@@ -176,6 +176,7 @@ int64_t calculateTextureSize(uint32_t width, uint32_t height, ePixelFormat pixel
         case R32F:
         case R32:
         case RG16:
+        case RG16_SIGNED:
         case RG16F:
             return static_cast<int64_t>(width) * height * 4;
         case RGB888:

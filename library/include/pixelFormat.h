@@ -11,6 +11,7 @@ enum ePixelFormat : uint16_t {
     RGBA16,
     RGB16,
     RG16,
+    RG16_SIGNED,
     R16,
     RGBA32F,
     RGB32F,
