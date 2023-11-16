@@ -55,6 +55,13 @@ DLL_EXPORT ePixelFormat get_uncompressed_pixel_format_variant(ePixelFormat pixel
 DLL_EXPORT sTexture *create_texture(const uint8_t *data, size_t dataSize, uint32_t width, uint32_t height, ePixelFormat pixelFormat);
 
 /**
+ * Creates an uninitialized texture.
+ *
+ * @return A pointer to the newly created texture or empty texture.
+ */
+DLL_EXPORT sTexture *create_uninitialized_texture();
+
+/**
  * Creates an empty texture with specified width, height, and pixel format.
  *
  * @param width The width of the texture in pixels.

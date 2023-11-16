@@ -24,6 +24,10 @@ create_texture(const uint8_t *data, size_t dataSize, uint32_t width, uint32_t he
     return createTexture(data, dataSize, width, height, pixelFormat);
 }
 
+sTexture *create_uninitialized_texture() {
+    return createTexture();
+}
+
 sTexture *create_empty_texture(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
     return createTexture(width, height, pixelFormat);
 }
