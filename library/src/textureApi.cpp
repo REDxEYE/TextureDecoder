@@ -83,6 +83,7 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
         return cConverters.at(key)(fromTexture, toTexture);
     } else {
         // Find possible intermediate formats for conversion
+        // TODO: Avoid conversion to lesser number of channels
         std::vector<uint32_t> fromConverters, toConverters;
         for (const auto &item: cConverters) {
             if ((ePixelFormat(item.first & 0xFFFF)) == fromTexture->m_pixelFormat) {
