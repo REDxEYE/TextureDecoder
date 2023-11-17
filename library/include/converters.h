@@ -67,6 +67,16 @@ bool convertRG16_SIGNEDtoRG16(const sTexture *fromTexture, sTexture *toTexture);
 
 bool convertRGBA1010102toRGBA8888(const sTexture *fromTexture, sTexture *toTexture);
 
+bool convertRGBA1010102toRGBA16(const sTexture *fromTexture, sTexture *toTexture);
+
+bool convertRA88toRG88(const sTexture *fromTexture, sTexture *toTexture);
+
+bool convertRG88toRA88(const sTexture *fromTexture, sTexture *toTexture);
+
+bool convertRA88toRGBA8888(const sTexture *fromTexture, sTexture *toTexture);
+
+bool convertRG16toRGBA16(const sTexture *fromTexture, sTexture *toTexture);
+
 #define DEFINE_CONVERTER(fromFmt, toFmt) {MAKE_PIXEL_PAIR(fromFmt, toFmt), convert##fromFmt##to##toFmt}
 
 #define DEFINE_TWO_WAY_CONVERTER(fromFmt, toFmt) DEFINE_CONVERTER(fromFmt, toFmt),DEFINE_CONVERTER(toFmt, fromFmt)
@@ -74,9 +84,11 @@ bool convertRGBA1010102toRGBA8888(const sTexture *fromTexture, sTexture *toTextu
 static std::unordered_map<uint32_t, tConverterFn> cConverters{
         DEFINE_CONVERTER(RGBA8888, RGBA8888),
         DEFINE_CONVERTER(RG16, RG88),
+        DEFINE_CONVERTER(RG16, RGBA16),
         DEFINE_CONVERTER(R16, R8),
         DEFINE_CONVERTER(RG16_SIGNED, RG16), // Remap signed to unsigned
         DEFINE_CONVERTER(RGBA1010102, RGBA8888),
+        DEFINE_CONVERTER(RGBA1010102, RGBA16),
         DEFINE_TWO_WAY_CONVERTER(RGBA8888, BGRA8888),
         DEFINE_TWO_WAY_CONVERTER(RGB888, RGBA8888),
         DEFINE_TWO_WAY_CONVERTER(RGB16F, RGB32F),
@@ -85,6 +97,8 @@ static std::unordered_map<uint32_t, tConverterFn> cConverters{
         DEFINE_TWO_WAY_CONVERTER(R8, RGBA8888),
         DEFINE_TWO_WAY_CONVERTER(RG88, RGB888),
         DEFINE_TWO_WAY_CONVERTER(RG88, RGBA8888),
+        DEFINE_TWO_WAY_CONVERTER(RA88, RG88),
+        DEFINE_CONVERTER(RA88, RGBA8888),
         DEFINE_CONVERTER(BC1, RGBA8888),
         DEFINE_CONVERTER(BC1a, RGBA8888),
         DEFINE_CONVERTER(BC2, RGBA8888),
