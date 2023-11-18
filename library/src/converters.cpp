@@ -374,7 +374,7 @@ bool convertRGBA1010102toRGBA8888(const sTexture *fromTexture, sTexture *toTextu
         red = red >> 2;
         green = green >> 2;
         blue = blue >> 2;
-        alpha = alpha * 0b01010101;
+        alpha = alpha * 85; // Remap 0-3 to 0-255
 
         toTexture->m_rawPixelData[i * 4 + 0] = (uint8_t) red;
         toTexture->m_rawPixelData[i * 4 + 1] = (uint8_t) green;
@@ -400,7 +400,7 @@ bool convertRGBA1010102toRGBA16(const sTexture *fromTexture, sTexture *toTexture
         red = red << 6 | red >> 4;
         green = green << 6 | green >> 4;
         blue = blue << 6 | blue >> 4;
-        alpha = alpha * 0b01010101;
+        alpha = alpha * 21845; // Remap 0-3 to 0-65535
 
         toTexture->m_rawPixelData[i * 4 + 0] = (uint8_t) red;
         toTexture->m_rawPixelData[i * 4 + 1] = (uint8_t) green;
