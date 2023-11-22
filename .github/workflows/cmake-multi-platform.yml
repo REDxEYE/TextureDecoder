@@ -23,9 +23,10 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
-        c_compiler: [gcc, cl]
+        c_compiler: [ gcc, cl, clang ] # Include clang for macOS
+        cpp_compiler: [ g++, cl, clang++ ] # Include clang++ for macOS
         include:
           - os: windows-latest
             c_compiler: cl
@@ -33,15 +34,20 @@ jobs:
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
+          - os: macos-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+            arch: universal # Add this to specify universal builds for macOS
         exclude:
-#          - os: ubuntu-latest
-#            c_compiler: clang
-#            cpp_compiler: clang++
           - os: windows-latest
             c_compiler: gcc
           - os: windows-latest
             c_compiler: clang
           - os: ubuntu-latest
+            c_compiler: cl
+          - os: macos-latest
+            c_compiler: gcc
+          - os: macos-latest
             c_compiler: cl
 
     steps:
@@ -56,9 +62,18 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+    - name: Configure CMake for macOS Universal Binary
+      if: matrix.os == 'macos-latest'
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" # Specify both architectures
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
+
+    - name: Configure CMake for Non-macOS
+      if: matrix.os != 'macos-latest'
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
@@ -89,3 +104,10 @@ jobs:
       with:
         name: texture-decoder-so
         path: ${{ steps.strings.outputs.build-output-dir }}/libTextureDecoder.so
+
+    - name: Upload TextureDecoder.dylib (macOS)
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v3
+      with:
+        name: texture-decoder-dylib
+        path: ${{ steps.strings.outputs.build-output-dir }}/libTextureDecoder.dylib
