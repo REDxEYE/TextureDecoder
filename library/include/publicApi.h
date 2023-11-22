@@ -137,6 +137,7 @@ DLL_EXPORT sTexture *load_dds(const char *filename);
 DLL_EXPORT sTexture *load_png(const char *filename, int expected_channels);
 DLL_EXPORT sTexture *load_tga(const char *filename, int expected_channels);
 DLL_EXPORT sTexture *load_hdr(const char *filename);
+DLL_EXPORT sTexture *load_pvr(const char *filename);
 DLL_EXPORT bool write_png(const char *filename, const sTexture* texture);
 DLL_EXPORT bool write_tga(const char *filename, const sTexture* texture);
 

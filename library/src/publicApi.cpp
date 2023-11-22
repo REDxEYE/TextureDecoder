@@ -6,6 +6,7 @@
 #include "hdr/hdrSupport.h"
 #include "tga/tgaSupport.h"
 #include "pixelFormat.h"
+#include "pvr/pvrSupport.h"
 
 int64_t get_buffer_size_from_texture_format(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
     return calculateTextureSize(width, height, pixelFormat);
@@ -93,6 +94,16 @@ sTexture *load_hdr(const char *filename) {
     return nullptr;
 }
 
+sTexture *load_pvr(const char *filename) {
+    sTexture *texture = createTexture();
+    if (loadPVR(filename, texture)) {
+        return texture;
+    }
+    freeTexture(texture);
+    return nullptr;
+}
+
+
 uint32_t get_texture_width(const sTexture *texture) {
     return texture->m_width;
 }
@@ -112,4 +123,3 @@ bool flip_texture(const sTexture *in_texture, sTexture *out_texture, bool flip_u
 ePixelFormat get_uncompressed_pixel_format_variant(ePixelFormat pixelFormat) {
     return getUncompressedPixelFormatVariant(pixelFormat);
 }
-
