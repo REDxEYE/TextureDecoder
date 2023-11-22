@@ -141,4 +141,8 @@ DLL_EXPORT sTexture *load_pvr(const char *filename);
 DLL_EXPORT bool write_png(const char *filename, const sTexture* texture);
 DLL_EXPORT bool write_tga(const char *filename, const sTexture* texture);
 
+// Expose ZSTD and LZ4 functions, since we already have them
+DLL_EXPORT size_t zstd_decompress( void* dst, size_t dstCapacity, const void* src, size_t compressedSize);
+DLL_EXPORT size_t lz4_decompress( void* dst, size_t dstCapacity, const void* src, size_t compressedSize);
+
 }

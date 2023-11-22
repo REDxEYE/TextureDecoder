@@ -1,4 +1,8 @@
 #include <cstring>
+
+#include "zstd.h"
+#include "lz4.h"
+
 #include "publicApi.h"
 #include "texture.h"
 #include "dds/ddsSupport.h"
@@ -122,4 +126,12 @@ bool flip_texture(const sTexture *in_texture, sTexture *out_texture, bool flip_u
 
 ePixelFormat get_uncompressed_pixel_format_variant(ePixelFormat pixelFormat) {
     return getUncompressedPixelFormatVariant(pixelFormat);
+}
+
+size_t zstd_decompress(void *dst, size_t dstCapacity, const void *src, size_t compressedSize) {
+    return ZSTD_decompress(dst, dstCapacity, src, compressedSize);
+}
+
+size_t lz4_decompress(void *dst, size_t dstCapacity, const void *src, size_t compressedSize) {
+    return LZ4_decompress_safe((char*)src, (char*)dst, compressedSize, dstCapacity);
 }
