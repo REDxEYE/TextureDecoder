@@ -63,7 +63,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     include(FetchContent)
 
     FetchContent_Declare(

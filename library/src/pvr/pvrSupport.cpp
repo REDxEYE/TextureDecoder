@@ -84,7 +84,7 @@ bool loadPVR(uint8_t *data, size_t dataSize, sTexture *texture) {
     }
 
     ePixelFormat outputFormat = ePixelFormat::INVALID;
-    if (header.channelBBP[0] == 0, header.channelBBP[1] == 0, header.channelBBP[2] == 0, header.channelBBP[3] == 0) {
+    if (header.channelBBP[0] == 0 && header.channelBBP[1] == 0 && header.channelBBP[2] == 0 && header.channelBBP[3] == 0) {
         switch (header.pixelFormat) {
 
             case ePvrPixelFormat::PVRTC_2bpp_RGB:
