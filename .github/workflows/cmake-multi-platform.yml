@@ -42,6 +42,10 @@ jobs:
           - os: windows-latest
             c_compiler: gcc
           - os: windows-latest
+            cpp_compiler: g++
+          - os: windows-latest
+            cpp_compiler: clang++
+          - os: windows-latest
             c_compiler: clang
           - os: ubuntu-latest
             c_compiler: cl
@@ -55,6 +59,10 @@ jobs:
             c_compiler: gcc
           - os: macos-latest
             c_compiler: cl
+          - os: macos-latest
+            cpp_compiler: g++
+          - os: macos-latest
+            cpp_compiler: cl
 
     steps:
     - uses: actions/checkout@v3
