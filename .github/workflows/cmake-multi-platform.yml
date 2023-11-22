@@ -23,7 +23,7 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
         c_compiler: [gcc, cl]
         include:
@@ -34,9 +34,9 @@ jobs:
             c_compiler: gcc
             cpp_compiler: g++
         exclude:
-#          - os: ubuntu-latest
-#            c_compiler: clang
-#            cpp_compiler: clang++
+          - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
           - os: windows-latest
             c_compiler: gcc
           - os: windows-latest
@@ -89,3 +89,10 @@ jobs:
       with:
         name: texture-decoder-so
         path: ${{ steps.strings.outputs.build-output-dir }}/libTextureDecoder.so
+
+    - name: Upload TextureDecoder.so (Linux)
+      if: runner.os == 'Macos'
+      uses: actions/upload-artifact@v3
+      with:
+        name: texture-decoder-dylib
+        path: ${{ steps.strings.outputs.build-output-dir }}/libTextureDecoder.dylib
