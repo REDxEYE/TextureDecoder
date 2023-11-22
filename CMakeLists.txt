@@ -4,7 +4,11 @@ project(TextureDecoder)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+SET(ZSTD_BUILD_STATIC ON)
 add_subdirectory(libs/argparse)
+add_subdirectory(libs/lz4/build/cmake)
+add_subdirectory(libs/zstd/build/cmake EXCLUDE_FROM_ALL)
+
 
 set(TextureDecoderSrc
         library/src/textureApi.cpp
@@ -20,34 +24,35 @@ set(TextureDecoderSrc
         library/src/logging.cpp
         library/src/fileAbstraction.cpp
         library/src/pixelFormat.cpp
+        library/src/pvr/pvrSupport.cpp
+        library/src/decoders/etc/etc1.cpp
+        library/src/shared.cpp
         )
 
 add_library(TextureDecoder SHARED ${TextureDecoderSrc} library/src/fileAbstraction.cpp)
-target_include_directories(TextureDecoder PUBLIC library/include libs/bcdec libs/stb libs/half)
+target_include_directories(TextureDecoder PUBLIC library/include libs/bcdec libs/stb libs/half  libs/zstd/lib)
+target_link_libraries(TextureDecoder PUBLIC libzstd_static lz4_static)
 
 add_library(TextureDecoderStatic STATIC ${TextureDecoderSrc})
-target_include_directories(TextureDecoderStatic PUBLIC library/include libs/bcdec libs/stb libs/half)
+target_include_directories(TextureDecoderStatic PUBLIC library/include libs/bcdec libs/stb libs/half libs/zstd/lib)
+target_link_libraries(TextureDecoderStatic PUBLIC libzstd_static lz4_static)
 
 add_executable(
         converter
         converter/src/main.cpp
         converter/src/main.cpp
         library/src/png/pngSupport.cpp
-        library/include/publicApi.h)
+        library/include/publicApi.h
+)
 target_link_libraries(
         converter
+        PRIVATE
         TextureDecoderStatic
         argparse
 )
 
-add_executable(
-        tester
-        tester/src/main.cpp
-)
-target_link_libraries(
-        tester
-        TextureDecoderStatic
-)
+add_executable(tester tester/src/main.cpp)
+target_link_libraries(tester PRIVATE TextureDecoderStatic)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -58,7 +63,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     include(FetchContent)
 
     FetchContent_Declare(
@@ -69,18 +74,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     FetchContent_MakeAvailable(fmt)
 
-    target_link_libraries(TextureDecoder fmt::fmt)
-    target_link_libraries(TextureDecoderStatic fmt::fmt)
-    target_link_libraries(tester fmt::fmt)
-    target_link_libraries(converter fmt::fmt)
-endif()
+    target_link_libraries(TextureDecoder PRIVATE fmt::fmt)
+    target_link_libraries(TextureDecoderStatic PRIVATE fmt::fmt)
+    target_link_libraries(tester PRIVATE fmt::fmt)
+    target_link_libraries(converter PRIVATE fmt::fmt)
+
+endif ()
 enable_testing()
 
-target_link_libraries(
-        tester
-        GTest::gtest_main
-)
+target_link_libraries(tester PRIVATE GTest::gtest_main)
 
 include(GoogleTest)
-gtest_discover_tests(tester
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+gtest_discover_tests(tester WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

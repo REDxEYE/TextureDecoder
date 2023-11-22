@@ -3,7 +3,9 @@
 //
 
 #pragma once
-#include "cstdint"
+#include <cstddef>
+#include <cstdint>
+#include <cassert>
 
 #if defined(_MSC_VER)
 //  Microsoft
@@ -31,3 +33,34 @@
 #endif
 
 
+#define MAKE_FOURCC(ch0, ch1, ch2, ch3) \
+        ((uint32_t)(uint8_t)(ch0) | ((uint32_t)(uint8_t)(ch1) << 8) | \
+        ((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24))
+
+
+/**
+ * Aligns a pointer to the specified alignment.
+ *
+ * @param ptr The original pointer.
+ * @param alignment The alignment boundary (must be a power of 2).
+ * @return Aligned pointer.
+ */
+void* alignPointer(void* ptr, std::size_t alignment);
+
+#define BSWAP_64(x)            \
+  ((((x) & 0xff00000000000000ull) >> 56)    \
+   | (((x) & 0x00ff000000000000ull) >> 40)    \
+   | (((x) & 0x0000ff0000000000ull) >> 24)    \
+   | (((x) & 0x000000ff00000000ull) >> 8)    \
+   | (((x) & 0x00000000ff000000ull) << 8)    \
+   | (((x) & 0x0000000000ff0000ull) << 24)    \
+   | (((x) & 0x000000000000ff00ull) << 40)    \
+   | (((x) & 0x00000000000000ffull) << 56))
+
+template<typename T,
+        typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
+constexpr T powImpl(T base, size_t exponent, T result);
+
+template<typename T,
+        typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
+constexpr T cpow(T base, size_t exponent);
