@@ -56,11 +56,3 @@ void* alignPointer(void* ptr, std::size_t alignment);
    | (((x) & 0x0000000000ff0000ull) << 24)    \
    | (((x) & 0x000000000000ff00ull) << 40)    \
    | (((x) & 0x00000000000000ffull) << 56))
-
-template<typename T,
-        typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
-constexpr T powImpl(T base, size_t exponent, T result);
-
-template<typename T,
-        typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
-constexpr T cpow(T base, size_t exponent);
