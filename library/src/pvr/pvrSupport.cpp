@@ -13,6 +13,7 @@
 bool loadPVR(const std::filesystem::path &filename, sTexture *texture) {
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
     if (!file) {
+        loggerEx(eLogLevel::ERROR, std::format("Failed to open {}.\n", filename.string()));
         return false;
     }
 
@@ -21,6 +22,7 @@ bool loadPVR(const std::filesystem::path &filename, sTexture *texture) {
 
     std::vector<uint8_t> data(fsize);
     if (!file.read(reinterpret_cast<char *>(data.data()), fsize)) {
+        loggerEx(eLogLevel::ERROR, "Failed to read file data.\n");
         return false;
     }
 
@@ -84,7 +86,8 @@ bool loadPVR(uint8_t *data, size_t dataSize, sTexture *texture) {
     }
 
     ePixelFormat outputFormat = ePixelFormat::INVALID;
-    if (header.channelBBP[0] == 0 && header.channelBBP[1] == 0 && header.channelBBP[2] == 0 && header.channelBBP[3] == 0) {
+    if (header.channelBBP[0] == 0 && header.channelBBP[1] == 0 && header.channelBBP[2] == 0 &&
+        header.channelBBP[3] == 0) {
         switch (header.pixelFormat) {
 
             case ePvrPixelFormat::PVRTC_2bpp_RGB:
@@ -208,7 +211,7 @@ bool loadPVR(uint8_t *data, size_t dataSize, sTexture *texture) {
     } else {
         texture->m_rawPixelData.resize(calculateTextureSize(texture));
 
-        if(header.pixelFormat==ePvrPixelFormat::ETC1) {
+        if (header.pixelFormat == ePvrPixelFormat::ETC1) {
             const uint64_t *src = reinterpret_cast<uint64_t *>(mip0Data.data());
             uint8_t *dst = texture->m_rawPixelData.data();
             uint8_t *output = dst;
@@ -220,8 +223,9 @@ bool loadPVR(uint8_t *data, size_t dataSize, sTexture *texture) {
                     src++;
                 }
             }
-        }else{
-            loggerEx(eLogLevel::ERROR, std::format("Unsupported PVR pixel format {}.\n", (uint32_t) header.pixelFormat));
+        } else {
+            loggerEx(eLogLevel::ERROR,
+                     std::format("Unsupported PVR pixel format {}.\n", (uint32_t) header.pixelFormat));
             return false;
         }
     }
