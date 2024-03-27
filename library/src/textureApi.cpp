@@ -145,6 +145,7 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
         freeTexture(tmpTexture);
         return true;
     }
+    return false;
 }
 
 #pragma clang diagnostic pop
@@ -172,6 +173,8 @@ int64_t calculateTextureSize(uint32_t width, uint32_t height, ePixelFormat pixel
         case INVALID:
             return -1;
             // Uncompressed formats
+        case RGBA1111:
+            return static_cast<int64_t>(width) * height / 2;
         case RGBA8888:
         case BGRA8888:
         case RGBA1010102:
@@ -186,6 +189,7 @@ int64_t calculateTextureSize(uint32_t width, uint32_t height, ePixelFormat pixel
         case RG88:
         case RA88:
         case RGB565:
+        case RGBA4444:
         case RGBA5551:
         case R16F:
         case R16:
@@ -211,6 +215,7 @@ int64_t calculateTextureSize(uint32_t width, uint32_t height, ePixelFormat pixel
         case BC1:
         case BC1a:
         case BC4:
+        case ETC1:
             return numBlocksWide * numBlocksHigh * 8; // 8 bytes per block
         case BC2:
         case BC3:
@@ -253,7 +258,7 @@ bool flipTexture(const sTexture *inTexture, sTexture *outTexture, bool flipUD, b
         return res;
     }
 
-    initTexture(outTexture,inTexture->m_width,inTexture->m_height,inTexture->m_pixelFormat);
+    initTexture(outTexture, inTexture->m_width, inTexture->m_height, inTexture->m_pixelFormat);
 
     uint32_t width = inTexture->m_width;
     uint32_t height = inTexture->m_height;

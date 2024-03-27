@@ -30,6 +30,7 @@ enum ePixelFormat : uint16_t {
     RGB565,
     RGBA5551,
     RGBA1010102,
+    RGBA4444,
     BC1,
     BC1a,
     BC2,
@@ -37,7 +38,9 @@ enum ePixelFormat : uint16_t {
     BC4,
     BC5,
     BC6,
-    BC7
+    BC7,
+    ETC1,
+    RGBA1111,
 };
 
 const char *getPixelFormatName(ePixelFormat pixelFormat);

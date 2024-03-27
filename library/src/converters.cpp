@@ -1,8 +1,8 @@
-#include <cstring>
 #include "converters.h"
 #include "bcdec.h"
 #include "half.h"
 #include "texture.h"
+#include "decoders/etc/etc1.h"
 
 
 bool convertRGBA8888toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
@@ -463,6 +463,48 @@ bool convertRG16toRGBA16(const sTexture *fromTexture, sTexture *toTexture) {
         toData[i * 4 + 1] = fromData[i * 2 + 1];
         toData[i * 4 + 2] = 0;
         toData[i * 4 + 3] = 0xFFFF;
+    }
+    return true;
+}
+
+bool convertRGBA4444toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
+    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
+    for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
+        toTexture->m_rawPixelData[i * 4 + 0] = (fromTexture->m_rawPixelData[i * 2 + 0] & 0xF) * 17;
+        toTexture->m_rawPixelData[i * 4 + 1] = ((fromTexture->m_rawPixelData[i * 2 + 0] >> 4) & 0xF) * 17;
+        toTexture->m_rawPixelData[i * 4 + 2] = (fromTexture->m_rawPixelData[i * 2 + 1] & 0xF) * 17;
+        toTexture->m_rawPixelData[i * 4 + 3] = ((fromTexture->m_rawPixelData[i * 2 + 1] >> 4) & 0xF) * 17;
+    }
+    return true;
+}
+
+
+bool convertRGBA1111toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
+    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
+    for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
+        int bitOffset = i % 2 == 0 ? 0 : 4;
+        toTexture->m_rawPixelData[i * 4 + 0] = ((fromTexture->m_rawPixelData[i / 2] >> (bitOffset + 0)) & 1) * 255;
+        toTexture->m_rawPixelData[i * 4 + 1] = ((fromTexture->m_rawPixelData[i / 2] >> (bitOffset + 1)) & 1) * 255;
+        toTexture->m_rawPixelData[i * 4 + 2] = ((fromTexture->m_rawPixelData[i / 2] >> (bitOffset + 2)) & 1) * 255;
+        toTexture->m_rawPixelData[i * 4 + 3] = ((fromTexture->m_rawPixelData[i / 2] >> (bitOffset + 3)) & 1) * 255;
+    }
+    return true;
+}
+
+bool convertETC1toRGB888(const sTexture *fromTexture, sTexture *toTexture) {
+    if (fromTexture->m_rawPixelData.size() <
+        BCDEC_BC1_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
+        return false;
+    const uint64_t *src = reinterpret_cast<const uint64_t *>(fromTexture->m_rawPixelData.data());
+    uint8_t *dst = toTexture->m_rawPixelData.data();
+    uint8_t *output = dst;
+    uint32_t i, j;
+    for (i = 0; i < toTexture->m_height; i += 4) {
+        for (j = 0; j < toTexture->m_width; j += 4) {
+            dst = output + (i * toTexture->m_width + j) * 3;
+            decode_etc1(*src, dst, toTexture->m_width);
+            src++;
+        }
     }
     return true;
 }

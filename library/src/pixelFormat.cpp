@@ -72,6 +72,12 @@ const char *getPixelFormatName(ePixelFormat pixelFormat) {
             return "BC6";
         case BC7:
             return "BC7";
+        case RGBA4444:
+            return "RGBA4444";
+        case RGBA1111:
+            return "RGBA1111";
+        case ETC1:
+            return "ETC1";
     }
     return "NO_NAME";
 }
@@ -81,6 +87,8 @@ int getChannelCount(ePixelFormat pixelFormat) {
         case RGBA32:
         case RGBA32F:
         case RGBA8888:
+        case RGBA4444:
+        case RGBA1111:
         case BGRA8888:
         case RGBA16:
         case RGBA16F:
@@ -100,6 +108,7 @@ int getChannelCount(ePixelFormat pixelFormat) {
         case RGB565:
         case BC1:
         case BC6:
+        case ETC1:
             return 3;
 
         case RG32:
@@ -136,6 +145,8 @@ ePixelFormat getUncompressedPixelFormatVariant(ePixelFormat pixelFormat) {
     switch (pixelFormat) {
         default:
             return pixelFormat;
+        case RGBA1111:
+        case ETC1:
         case BC1:
         case BC1a:
         case BC2:
@@ -207,5 +218,11 @@ int getPixelFormatPixelSize(ePixelFormat pixelFormat) {
             return 2;
         case RGBA1010102:
             return 4;
+        case RGBA4444:
+            return 2;
+        case RGBA1111:
+            return 1;
+        case ETC1:
+            return 1;
     }
 }

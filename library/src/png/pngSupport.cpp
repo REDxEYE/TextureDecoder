@@ -112,7 +112,7 @@ bool writePNG(const std::filesystem::path &filename, const sTexture *texture) {
         }
         sTexture *tmpTexture = createTexture(texture->m_width, texture->m_height, tmpPixelFormat);
         if (!convertTexture(texture, tmpTexture)) {
-            loggerEx(eLogLevel::ERROR, "Failed to save PNG\n");
+            loggerEx(eLogLevel::ERROR, "Failed to convert texture before saving to PNG\n");
             return false;
         }
         bool res = writePNG(filename, tmpTexture);
