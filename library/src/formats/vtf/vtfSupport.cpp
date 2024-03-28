@@ -143,7 +143,7 @@ bool loadVTF(uint8_t *data, size_t dataSize, sTexture *texture) {
         cTexture.m_height = texture->m_height;
         cTexture.m_width = texture->m_width;
         cTexture.m_pixelFormat = pixel_format;
-        uint32_t buffer_size;
+        size_t buffer_size;
         uint8_t *buffer = vtf.get_highres_image(buffer_size);
         cTexture.m_rawPixelData.assign(buffer, buffer + buffer_size);
         ePixelFormat targetFormat;
@@ -169,7 +169,7 @@ bool loadVTF(uint8_t *data, size_t dataSize, sTexture *texture) {
         texture->m_pixelFormat = flipFormat;
 
     } else {
-        uint32_t buffer_size;
+        size_t buffer_size;
         uint8_t *buffer = vtf.get_highres_image(buffer_size);
         texture->m_rawPixelData.assign(buffer, buffer + buffer_size);
     }
