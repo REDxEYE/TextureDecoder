@@ -5,12 +5,12 @@
 
 #include "publicApi.h"
 #include "texture.h"
-#include "dds/ddsSupport.h"
-#include "png/pngSupport.h"
-#include "hdr/hdrSupport.h"
-#include "tga/tgaSupport.h"
+#include "formats/dds/ddsSupport.h"
+#include "formats/png/pngSupport.h"
+#include "formats/hdr/hdrSupport.h"
+#include "formats/tga/tgaSupport.h"
+#include "formats/pvr/pvrSupport.h"
 #include "pixelFormat.h"
-#include "pvr/pvrSupport.h"
 
 int64_t get_buffer_size_from_texture_format(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
     return calculateTextureSize(width, height, pixelFormat);
@@ -133,5 +133,5 @@ size_t zstd_decompress(void *dst, size_t dstCapacity, const void *src, size_t co
 }
 
 size_t lz4_decompress(void *dst, size_t dstCapacity, const void *src, size_t compressedSize) {
-    return LZ4_decompress_safe((char*)src, (char*)dst, compressedSize, dstCapacity);
+    return LZ4_decompress_safe((char *) src, (char *) dst, compressedSize, dstCapacity);
 }

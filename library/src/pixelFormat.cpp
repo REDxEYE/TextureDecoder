@@ -42,16 +42,20 @@ const char *getPixelFormatName(ePixelFormat pixelFormat) {
             return "RGBA8888";
         case BGRA8888:
             return "BGRA8888";
+        case ABGR8888:
+            return "ABGR8888";
+        case ARGB8888:
+            return "ARGB8888";
         case RGB888:
             return "RGB888";
+        case BGR888:
+            return "BGR888";
         case RG88:
             return "RG88";
         case RA88:
             return "RA88";
         case R8:
             return "R8";
-        case RGB565:
-            return "RGB565";
         case RGBA5551:
             return "RGBA5551";
         case RGBA1010102:
@@ -78,6 +82,8 @@ const char *getPixelFormatName(ePixelFormat pixelFormat) {
             return "RGBA1111";
         case ETC1:
             return "ETC1";
+        case RGB565:
+            return "RGB565";
     }
     return "NO_NAME";
 }
@@ -93,6 +99,8 @@ int getChannelCount(ePixelFormat pixelFormat) {
         case RGBA16:
         case RGBA16F:
         case RGBA5551:
+        case ABGR8888:
+        case ARGB8888:
         case RGBA1010102:
         case BC1a:
         case BC2:
@@ -103,6 +111,7 @@ int getChannelCount(ePixelFormat pixelFormat) {
         case RGB32:
         case RGB32F:
         case RGB888:
+        case BGR888:
         case RGB16:
         case RGB16F:
         case RGB565:
@@ -203,8 +212,11 @@ int getPixelFormatPixelSize(ePixelFormat pixelFormat) {
         case RGBA8888:
             return 4;
         case BGRA8888:
+        case ABGR8888:
+        case ARGB8888:
             return 4;
         case RGB888:
+        case BGR888:
             return 3;
         case RG88:
             return 2;

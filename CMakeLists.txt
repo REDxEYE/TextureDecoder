@@ -11,23 +11,25 @@ add_subdirectory(libs/zstd/build/cmake EXCLUDE_FROM_ALL)
 
 
 set(TextureDecoderSrc
-        library/src/textureApi.cpp
+        library/src/formats/dds/ddsSupport.cpp
+        library/src/formats/png/pngSupport.cpp
+        library/src/formats/hdr/hdrSupport.cpp
+        library/src/formats/tga/tgaSupport.cpp
+        library/src/formats/vtf/vtfSupport.cpp
+        library/src/formats/vtf/vtflib.cpp
+        library/src/formats/pvr/pvrSupport.cpp
+        library/src/decoders/etc/etc1.cpp
         library/src/converters.cpp
-        library/src/dds/ddsSupport.cpp
-        library/src/png/pngSupport.cpp
-        library/src/hdr/hdrSupport.cpp
-        library/src/tga/tgaSupport.cpp
-        library/src/blockCompression.cpp
-        library/src/stb.cpp
-        libs/half/half.cpp
+        library/src/textureApi.cpp
         library/src/publicApi.cpp
+
         library/src/logging.cpp
         library/src/fileAbstraction.cpp
         library/src/pixelFormat.cpp
-        library/src/pvr/pvrSupport.cpp
-        library/src/decoders/etc/etc1.cpp
         library/src/shared.cpp
-        )
+        library/src/stb.cpp
+        libs/half/half.cpp
+)
 
 add_library(TextureDecoder SHARED ${TextureDecoderSrc} library/src/fileAbstraction.cpp)
 target_include_directories(TextureDecoder PUBLIC library/include libs/bcdec libs/stb libs/half  libs/zstd/lib)
@@ -41,8 +43,11 @@ add_executable(
         converter
         converter/src/main.cpp
         converter/src/main.cpp
-        library/src/png/pngSupport.cpp
+        library/src/formats/png/pngSupport.cpp
         library/include/publicApi.h
+        library/src/formats/vtf/vtfSupport.cpp
+        library/include/formats/vtf/vtfSupport.h
+        library/src/formats/vtf/vtflib.cpp
 )
 target_link_libraries(
         converter
@@ -51,7 +56,11 @@ target_link_libraries(
         argparse
 )
 
-add_executable(tester tester/src/main.cpp)
+add_executable(tester tester/src/main.cpp
+        tester/src/dds.cpp
+        tester/src/shared.h
+        tester/src/pvr.cpp
+        tester/src/vtf.cpp)
 target_link_libraries(tester PRIVATE TextureDecoderStatic)
 
 include(FetchContent)
