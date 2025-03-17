@@ -37,9 +37,10 @@ bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
         loggerEx(eLogLevel::ERROR, "Not enough data to read DDS ident. Possibly truncated file\n");
         return false;
     }
-    uint32_t ident = *(uint32_t *) data;
+    uint32_t ident = *reinterpret_cast<uint32_t *>(data);
     data += 4;
-    if (ident != 542327876) { // Not a DDS ident
+    if (ident != 542327876) {
+        // Not a DDS ident
         return false;
     }
     dataSize -= 4;
@@ -47,7 +48,7 @@ bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
         loggerEx(eLogLevel::ERROR, "Not enough data to read DDS header. Possibly truncated file\n");
         return false;
     }
-    sDDSHeader *header = (sDDSHeader *) data;
+    sDDSHeader *header = reinterpret_cast<sDDSHeader *>(data);
     data += sizeof(sDDSHeader);
     dataSize -= 124;
     texture->m_width = header->m_width;
@@ -90,7 +91,6 @@ bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
                     pData[i + 1] = (pixel & gMask) >> greenShift;
                     pData[i + 2] = (pixel & bMask) >> blueShift;
                     pData[i + 3] = (pixel & aMask) >> alphaShift;
-
                 }
                 break;
             }
@@ -119,6 +119,11 @@ bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
                 }
                 break;
             }
+            default: {
+                loggerEx(eLogLevel::ERROR, "Invalid RGBA bitmask format\n");
+                return false;
+                break;
+            }
         }
     } else {
         texture->m_rawPixelData.assign(data, data + pixelDataSize);
@@ -133,12 +138,12 @@ void setTextureFormatInfo(sDDSHeader *header, sTexture *texture) {
     eDDSPixelFormatFlags flags = header->m_pixelFormat.m_flags;
     if (flags & eDDSPixelFormatFlags::FOURCC) {
         if (
-                (flags & eDDSPixelFormatFlags::ALPHA) != 0 ||
-                (flags & eDDSPixelFormatFlags::ALPHAPIXELS) != 0 ||
-                (flags & eDDSPixelFormatFlags::LUMINANCE) != 0 ||
-                (flags & eDDSPixelFormatFlags::RGB) != 0 ||
-                (flags & eDDSPixelFormatFlags::YUV) != 0
-                ) {
+            (flags & eDDSPixelFormatFlags::ALPHA) != 0 ||
+            // (flags & eDDSPixelFormatFlags::ALPHAPIXELS) != 0 ||
+            (flags & eDDSPixelFormatFlags::LUMINANCE) != 0 ||
+            // (flags & eDDSPixelFormatFlags::RGB) != 0 ||
+            (flags & eDDSPixelFormatFlags::YUV) != 0
+        ) {
             texture->m_pixelFormat = ePixelFormat::INVALID;
             return;
         }
@@ -172,6 +177,10 @@ void setTextureFormatInfo(sDDSHeader *header, sTexture *texture) {
             case MAKE_FOURCC('D', 'X', '1', '0'): {
                 sDX10Header *dx10Header = (sDX10Header *) (((uint8_t *) header) + sizeof(sDDSHeader));
                 switch (dx10Header->m_dxgiFormat) {
+                    case DX10_B8G8R8A8_UNORM_SRGB:
+                    case DX10_B8G8R8A8_UNORM:
+                        texture->m_pixelFormat = ePixelFormat::BGRA8888;
+                        break;
                     case DX10_R16G16_UINT:
                     case DX10_R16G16_UNORM:
                         texture->m_pixelFormat = ePixelFormat::RG16;
@@ -268,4 +277,3 @@ int bitShift(uint32_t mask) {
     }
     return shift;
 }
-
