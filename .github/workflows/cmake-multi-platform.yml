@@ -107,21 +107,21 @@ jobs:
 
     - name: Upload TextureDecoder.dll (Windows)
       if: runner.os == 'Windows'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: texture-decoder-dll
         path: ${{ steps.strings.outputs.build-output-dir }}\Release\TextureDecoder.dll
 
     - name: Upload TextureDecoder.so (Linux)
       if: runner.os == 'Linux'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: texture-decoder-so
         path: ${{ steps.strings.outputs.build-output-dir }}/libTextureDecoder.so
 
     - name: Upload TextureDecoder.dylib (macOS)
       if: runner.os == 'macOS'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: texture-decoder-dylib
         path: ${{ steps.strings.outputs.build-output-dir }}/libTextureDecoder.dylib
