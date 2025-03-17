@@ -250,7 +250,6 @@ bool convertR8toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
         toTexture->m_rawPixelData[i * 4 + 1] = 0;
         toTexture->m_rawPixelData[i * 4 + 2] = 0;
         toTexture->m_rawPixelData[i * 4 + 3] = 255;
-
     }
     return true;
 }
@@ -261,7 +260,6 @@ bool convertRG88toRGB888(const sTexture *fromTexture, sTexture *toTexture) {
         toTexture->m_rawPixelData[i * 3 + 0] = fromTexture->m_rawPixelData[i * 2 + 0];
         toTexture->m_rawPixelData[i * 3 + 1] = fromTexture->m_rawPixelData[i * 2 + 1];
         toTexture->m_rawPixelData[i * 3 + 2] = 0;
-
     }
     return true;
 }
@@ -273,7 +271,6 @@ bool convertRG88toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
         toTexture->m_rawPixelData[i * 4 + 1] = fromTexture->m_rawPixelData[i * 2 + 1];
         toTexture->m_rawPixelData[i * 4 + 2] = 0;
         toTexture->m_rawPixelData[i * 4 + 3] = 255;
-
     }
     return true;
 }
@@ -282,7 +279,6 @@ bool convertRG88toR8(const sTexture *fromTexture, sTexture *toTexture) {
     toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
     for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
         toTexture->m_rawPixelData[i] = fromTexture->m_rawPixelData[i * 2];
-
     }
     return true;
 }
@@ -291,7 +287,6 @@ bool convertRGB888toR8(const sTexture *fromTexture, sTexture *toTexture) {
     toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
     for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
         toTexture->m_rawPixelData[i] = fromTexture->m_rawPixelData[i * 3];
-
     }
     return true;
 }
@@ -300,7 +295,6 @@ bool convertRGBA8888toR8(const sTexture *fromTexture, sTexture *toTexture) {
     toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
     for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
         toTexture->m_rawPixelData[i] = fromTexture->m_rawPixelData[i * 4];
-
     }
     return true;
 }
@@ -310,7 +304,6 @@ bool convertRGB888toRG88(const sTexture *fromTexture, sTexture *toTexture) {
     for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
         toTexture->m_rawPixelData[i * 2 + 0] = fromTexture->m_rawPixelData[i * 3 + 0];
         toTexture->m_rawPixelData[i * 2 + 1] = fromTexture->m_rawPixelData[i * 3 + 1];
-
     }
     return true;
 }
@@ -320,7 +313,6 @@ bool convertRGBA8888toRG88(const sTexture *fromTexture, sTexture *toTexture) {
     for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
         toTexture->m_rawPixelData[i * 2 + 0] = fromTexture->m_rawPixelData[i * 4 + 0];
         toTexture->m_rawPixelData[i * 2 + 1] = fromTexture->m_rawPixelData[i * 4 + 1];
-
     }
     return true;
 }
@@ -373,7 +365,6 @@ bool convertRG16toRG88(const sTexture *fromTexture, sTexture *toTexture) {
     toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
     const uint16_t *fromData = reinterpret_cast<const uint16_t *>(fromTexture->m_rawPixelData.data());
     for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
-
         toTexture->m_rawPixelData[i * 2 + 0] = (uint8_t) (fromData[i * 2 + 0] >> 8);
         toTexture->m_rawPixelData[i * 2 + 1] = (uint8_t) (fromData[i * 2 + 1] >> 8);
     }
@@ -448,7 +439,6 @@ bool convertR16toR8(const sTexture *fromTexture, sTexture *toTexture) {
     toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
     const uint16_t *fromData = reinterpret_cast<const uint16_t *>(fromTexture->m_rawPixelData.data());
     for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
-
         toTexture->m_rawPixelData[i] = (uint8_t) (fromData[i] >> 8);
     }
     return true;
@@ -540,6 +530,7 @@ bool convertRGB565toRGB888(const sTexture *fromTexture, sTexture *toTexture) {
                 uint16_t g: 6;
                 uint16_t b: 5;
             } rgb;
+
             uint16_t d;
         } pixel;
         pixel.d = uint16_t(fromTexture->m_rawPixelData[i * 2 + 1]) << 8 |
@@ -587,6 +578,7 @@ bool convertRGBA5551toRGBA8888(const sTexture *fromTexture, sTexture *toTexture)
                 uint16_t b: 5;
                 uint16_t a: 1;
             } rgb;
+
             uint16_t d;
         } pixel;
         pixel.d = uint16_t(fromTexture->m_rawPixelData[i * 2 + 1]) << 8 |
@@ -596,6 +588,32 @@ bool convertRGBA5551toRGBA8888(const sTexture *fromTexture, sTexture *toTexture)
         toTexture->m_rawPixelData[i * 4 + 1] = ((uint16_t) pixel.rgb.g * 255) / 31;
         toTexture->m_rawPixelData[i * 4 + 2] = ((uint16_t) pixel.rgb.b * 255) / 31;
         toTexture->m_rawPixelData[i * 4 + 3] = ((uint16_t) pixel.rgb.a * 255);
+    }
+    return true;
+}
+
+bool convertRGB32FtoRGBA32F(const sTexture *fromTexture, sTexture *toTexture) {
+    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
+    const float *fromData = reinterpret_cast<const float *>(fromTexture->m_rawPixelData.data());
+    float *toData = reinterpret_cast<float *>(toTexture->m_rawPixelData.data());
+    for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
+        toData[i * 4 + 0] = fromData[i * 3 + 0];
+        toData[i * 4 + 1] = fromData[i * 3 + 1];
+        toData[i * 4 + 2] = fromData[i * 3 + 2];
+        toData[i * 4 + 3] = 1.f;
+    }
+    return true;
+}
+
+bool convertRGB16FtoRGBA16F(const sTexture *fromTexture, sTexture *toTexture) {
+    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
+    const uint16_t *fromData = reinterpret_cast<const uint16_t *>(fromTexture->m_rawPixelData.data());
+    uint16_t *toData = reinterpret_cast<uint16_t *>(toTexture->m_rawPixelData.data());
+    for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
+        toData[i * 4 + 0] = fromData[i * 3 + 0];
+        toData[i * 4 + 1] = fromData[i * 3 + 1];
+        toData[i * 4 + 2] = fromData[i * 3 + 2];
+        toData[i * 4 + 3] = 0x3c00;
     }
     return true;
 }

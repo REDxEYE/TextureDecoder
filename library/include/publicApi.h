@@ -145,4 +145,6 @@ DLL_EXPORT bool write_tga(const char *filename, const sTexture* texture);
 DLL_EXPORT size_t zstd_decompress( void* dst, size_t dstCapacity, const void* src, size_t compressedSize);
 DLL_EXPORT size_t lz4_decompress( void* dst, size_t dstCapacity, const void* src, size_t compressedSize);
 
+DLL_EXPORT void print_all_converters();
+
 }

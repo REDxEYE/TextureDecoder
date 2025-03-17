@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
     sTexture cTexture;
     cTexture.m_height = texture.m_height;
     cTexture.m_width = texture.m_width;
-    cTexture.m_pixelFormat = ePixelFormat::RGBA8888;
+    cTexture.m_pixelFormat = ePixelFormat::RGB16F;
 
     if (convertTexture(&texture, &cTexture))
         stbi_write_tga(output_filepath.string().c_str(), (int) texture.m_width, (int) texture.m_height, 4,

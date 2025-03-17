@@ -86,6 +86,8 @@ bool convertRGBA5551toRGBA8888(const sTexture *fromTexture, sTexture *toTexture)
 bool convertRGB888toBGR888(const sTexture *fromTexture, sTexture *toTexture);
 bool convertBGR888toRGB888(const sTexture *fromTexture, sTexture *toTexture);
 bool convertRGBA8888toARGB8888(const sTexture *fromTexture, sTexture *toTexture);
+bool convertRGB32FtoRGBA32F(const sTexture *fromTexture, sTexture *toTexture);
+bool convertRGB16FtoRGBA16F(const sTexture *fromTexture, sTexture *toTexture);
 
 #define DEFINE_CONVERTER(fromFmt, toFmt) {MAKE_PIXEL_PAIR(fromFmt, toFmt), convert##fromFmt##to##toFmt}
 
@@ -128,4 +130,6 @@ static std::unordered_map<uint32_t, tConverterFn> cConverters{
         DEFINE_CONVERTER(BC6, RGB32F),
         DEFINE_CONVERTER(BC7, RGBA8888),
         DEFINE_CONVERTER(ETC1, RGB888),
+        DEFINE_CONVERTER(RGB32F, RGBA32F),
+        DEFINE_CONVERTER(RGB16F, RGBA16F),
 };

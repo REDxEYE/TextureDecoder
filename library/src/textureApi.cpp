@@ -33,7 +33,6 @@ void initTexture(sTexture *texture, uint32_t width, uint32_t height, ePixelForma
 sTexture *createTexture(const uint8_t *data, size_t dataSize,
                         uint32_t width, uint32_t height,
                         ePixelFormat pixelFormat) {
-
     if (calculateTextureSize(width, height, pixelFormat) > dataSize) {
         loggerEx(eLogLevel::ERROR,
                  std::format("Textures size doesn't match to calculated size for {}x{} {}. Expected {}, but got {}\n",
@@ -76,6 +75,7 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
 
     // Key for the converter map based on source and target formats
     uint32_t key = MAKE_PIXEL_PAIR(fromTexture->m_pixelFormat, toTexture->m_pixelFormat);
+    loggerEx(DEBUG, std::format("Convert key {}\n", key));
     if (cConverters.contains(key)) {
         loggerEx(eLogLevel::DEBUG,
                  std::format("Converting from {} to {}\n", getPixelFormatName(fromTexture->m_pixelFormat),
@@ -172,7 +172,7 @@ int64_t calculateTextureSize(uint32_t width, uint32_t height, ePixelFormat pixel
     switch (pixelFormat) {
         case INVALID:
             return -1;
-            // Uncompressed formats
+        // Uncompressed formats
         case RGBA1111:
             return static_cast<int64_t>(width) * height / 2;
         case RGBA8888:
@@ -214,7 +214,7 @@ int64_t calculateTextureSize(uint32_t width, uint32_t height, ePixelFormat pixel
         case RGB16F:
             return static_cast<int64_t>(width) * height * 6;
 
-            // Compressed formats
+        // Compressed formats
         case BC1:
         case BC1a:
         case BC4:
@@ -294,5 +294,3 @@ bool flipTexture(const sTexture *inTexture, sTexture *outTexture, bool flipUD, b
 }
 
 #pragma clang diagnostic pop
-
-

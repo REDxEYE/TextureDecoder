@@ -4,6 +4,9 @@
 #include "lz4.h"
 
 #include "publicApi.h"
+
+#include "converters.h"
+#include "logging.h"
 #include "texture.h"
 #include "formats/dds/ddsSupport.h"
 #include "formats/png/pngSupport.h"
@@ -134,4 +137,13 @@ size_t zstd_decompress(void *dst, size_t dstCapacity, const void *src, size_t co
 
 size_t lz4_decompress(void *dst, size_t dstCapacity, const void *src, size_t compressedSize) {
     return LZ4_decompress_safe((char *) src, (char *) dst, compressedSize, dstCapacity);
+}
+
+void print_all_converters() {
+    for (auto c_converter: cConverters) {
+        uint32_t key = c_converter.first;
+        const char *f1 = getPixelFormatName(static_cast<ePixelFormat>(key & 0xFFFF));
+        const char *f2 = getPixelFormatName(static_cast<ePixelFormat>(key >> 16));
+        loggerEx(INFO, std::format("Converter ({}) {} -> {}\n", key, f1, f2));
+    }
 }
