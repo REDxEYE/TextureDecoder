@@ -179,6 +179,8 @@ void setTextureFormatInfo(sDDSHeader *header, sTexture *texture) {
                 switch (dx10Header->m_dxgiFormat) {
                     case DX10_B8G8R8A8_UNORM_SRGB:
                     case DX10_B8G8R8A8_UNORM:
+                    case DX10_B8G8R8X8_UNORM_SRGB:
+                    case DX10_B8G8R8X8_UNORM:
                         texture->m_pixelFormat = ePixelFormat::BGRA8888;
                         break;
                     case DX10_R16G16_UINT:
