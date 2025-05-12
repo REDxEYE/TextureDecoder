@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 
 int bitShift(uint32_t mask);
 
-void setTextureFormatInfo(sDDSHeader *header, sTexture *texture);
+void setTextureFormatInfo(const sDDSHeader *header, sTexture *texture);
 
 bool loadDDS(const fs::path &filename, sTexture *texture) {
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
@@ -32,12 +32,12 @@ bool loadDDS(const fs::path &filename, sTexture *texture) {
     return res;
 }
 
-bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
+bool loadDDS(const uint8_t *data, size_t dataSize, sTexture *texture) {
     if (dataSize < 4) {
         loggerEx(eLogLevel::ERROR, "Not enough data to read DDS ident. Possibly truncated file\n");
         return false;
     }
-    uint32_t ident = *reinterpret_cast<uint32_t *>(data);
+    uint32_t ident = *reinterpret_cast<const uint32_t *>(data);
     data += 4;
     if (ident != 542327876) {
         // Not a DDS ident
@@ -48,7 +48,7 @@ bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
         loggerEx(eLogLevel::ERROR, "Not enough data to read DDS header. Possibly truncated file\n");
         return false;
     }
-    sDDSHeader *header = reinterpret_cast<sDDSHeader *>(data);
+    const sDDSHeader *header = reinterpret_cast<const sDDSHeader *>(data);
     data += sizeof(sDDSHeader);
     dataSize -= 124;
     texture->m_width = header->m_width;
@@ -134,7 +134,7 @@ bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture) {
 }
 
 
-void setTextureFormatInfo(sDDSHeader *header, sTexture *texture) {
+void setTextureFormatInfo(const sDDSHeader *header, sTexture *texture) {
     eDDSPixelFormatFlags flags = header->m_pixelFormat.m_flags;
     if (flags & eDDSPixelFormatFlags::FOURCC) {
         if (

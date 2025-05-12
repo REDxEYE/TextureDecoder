@@ -127,7 +127,6 @@ int getChannelCount(ePixelFormat pixelFormat) {
         case RG16_SIGNED:
         case RG16F:
         case RA88:
-        case BC4:
         case BC5:
             return 2;
 
@@ -136,6 +135,7 @@ int getChannelCount(ePixelFormat pixelFormat) {
         case R8:
         case R16:
         case R16F:
+        case BC4:
             return 1;
 
         case INVALID:

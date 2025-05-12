@@ -2,21 +2,22 @@
 #include <cstdio>
 
 loggerFn logger = &defaultLogger;
+eLogLevel logLevel = eLogLevel::INFO;
 
 void defaultLogger(eLogLevel level, const char *message) {
     const char *levelName;
     switch (level) {
-        case 0:
+        case eLogLevel::DEBUG:
             levelName = "DEBUG";
             break;
         default:
-        case 1:
+        case eLogLevel::INFO:
             levelName = "INFO";
             break;
-        case 2:
+        case eLogLevel::WARN:
             levelName = "WARN";
             break;
-        case 3:
+        case eLogLevel::ERROR:
             levelName = "ERROR";
             break;
     }
@@ -24,6 +25,9 @@ void defaultLogger(eLogLevel level, const char *message) {
 }
 
 void loggerEx(eLogLevel level, const std::string &message) {
+    if(level<logLevel){
+        return;
+    }
     logger(level, message.c_str());
 }
 

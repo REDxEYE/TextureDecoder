@@ -134,6 +134,7 @@ DLL_EXPORT void free_texture(sTexture *texture);
 
 
 DLL_EXPORT sTexture *load_dds(const char *filename);
+DLL_EXPORT sTexture *load_dds_from_data(const char *data, uint32_t size);
 DLL_EXPORT sTexture *load_png(const char *filename, int expected_channels);
 DLL_EXPORT sTexture *load_tga(const char *filename, int expected_channels);
 DLL_EXPORT sTexture *load_hdr(const char *filename);
@@ -146,5 +147,5 @@ DLL_EXPORT size_t zstd_decompress( void* dst, size_t dstCapacity, const void* sr
 DLL_EXPORT size_t lz4_decompress( void* dst, size_t dstCapacity, const void* src, size_t compressedSize);
 
 DLL_EXPORT void print_all_converters();
-
+DLL_EXPORT void set_log_level(uint32_t level);
 }

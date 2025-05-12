@@ -15,7 +15,10 @@
 #include "formats/pvr/pvrSupport.h"
 #include "pixelFormat.h"
 
-int64_t get_buffer_size_from_texture_format(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
+int64_t get_buffer_size_from_texture_format(uint32_t
+                                            width,
+                                            uint32_t height, ePixelFormat
+                                            pixelFormat) {
     return calculateTextureSize(width, height, pixelFormat);
 }
 
@@ -36,8 +39,13 @@ sTexture *create_uninitialized_texture() {
     return createTexture();
 }
 
-sTexture *create_empty_texture(uint32_t width, uint32_t height, ePixelFormat pixelFormat) {
-    return createTexture(width, height, pixelFormat);
+sTexture *create_empty_texture(uint32_t
+                               width,
+                               uint32_t height, ePixelFormat
+                               pixelFormat) {
+    return
+            createTexture(width, height, pixelFormat
+            );
 }
 
 bool convert_texture(const sTexture *from_texture, sTexture *to_texture) {
@@ -59,6 +67,15 @@ void free_texture(sTexture *texture) {
 sTexture *load_dds(const char *filename) {
     sTexture *texture = createTexture();
     if (loadDDS(filename, texture)) {
+        return texture;
+    }
+    freeTexture(texture);
+    return nullptr;
+}
+
+sTexture *load_dds_from_data(const char *data, uint32_t size) {
+    sTexture *texture = createTexture();
+    if (loadDDS(reinterpret_cast<const uint8_t *>(data), size, texture)) {
         return texture;
     }
     freeTexture(texture);
@@ -146,4 +163,9 @@ void print_all_converters() {
         const char *f2 = getPixelFormatName(static_cast<ePixelFormat>(key >> 16));
         loggerEx(INFO, std::format("Converter ({}) {} -> {}\n", key, f1, f2));
     }
+}
+
+extern eLogLevel logLevel;
+void set_log_level(uint32_t level){
+    logLevel = (eLogLevel)level;
 }

@@ -3,6 +3,8 @@
 #include "half.h"
 #include "texture.h"
 #include "decoders/etc/etc1.h"
+#include <cstring>
+#include <functional>
 
 
 bool convertRGBA8888toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
@@ -51,23 +53,53 @@ bool convertRGB16FtoRGB32F(const sTexture *fromTexture, sTexture *toTexture) {
     return true;
 }
 
+using Decoder = std::function<void(void *src, void *dst, int len)>;
+
+template<size_t blockSize, size_t pixelSize>
+void
+partialBCnToRGBA8888(const uint8_t *src, uint8_t *dst, uint32_t partialWidth, uint32_t partialHeight, uint32_t stride,
+                     const Decoder &decoder) {
+    static uint8_t tmpBuffer[blockSize * blockSize * pixelSize];
+    decoder((void *) src, (void *) tmpBuffer, blockSize * pixelSize);
+
+    for (int y = 0; y < partialHeight; y++) {
+        memcpy(dst + y * stride, &tmpBuffer[y * blockSize], partialWidth * blockSize);
+    }
+}
+
+template<size_t blockDataSize, size_t blockSize, size_t pixelSize>
+bool convertBCnToRGBA8888(const sTexture *fromTexture, sTexture *toTexture, const Decoder &decoder) {
+    const uint8_t *src = fromTexture->m_rawPixelData.data();
+    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
+    uint8_t *dst = toTexture->m_rawPixelData.data();
+    uint8_t *output = dst;
+    uint32_t stride = fromTexture->m_width * pixelSize;
+    for (int y = 0; y < fromTexture->m_height; y += blockSize) {
+        for (int x = 0; x < fromTexture->m_width; x += blockSize) {
+            if (x >= toTexture->m_width) {
+                continue;
+            }
+
+            dst = output + (y * fromTexture->m_width + x) * pixelSize;
+            if (y + blockSize <= toTexture->m_height && x + blockSize <= toTexture->m_width) {
+                decoder((void *) src, dst, (int) stride);
+            } else {
+                uint32_t partialWidth = std::min(fromTexture->m_width - x, (uint32_t) blockSize);
+                uint32_t partialHeight = std::min(fromTexture->m_height - y, (uint32_t) blockSize);
+                partialBCnToRGBA8888<blockSize, pixelSize>(src, dst, partialWidth, partialHeight, stride, &bcdec_bc1);
+            }
+
+            src += blockDataSize;
+        }
+    }
+    return true;
+}
 
 bool convertBC1toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_rawPixelData.size() <
         BCDEC_BC1_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
         return false;
-    int i, j;
-    const uint8_t *src = fromTexture->m_rawPixelData.data();
-    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
-    uint8_t *dst = toTexture->m_rawPixelData.data();
-    uint8_t *output = dst;
-    for (i = 0; i < fromTexture->m_height; i += 4) {
-        for (j = 0; j < fromTexture->m_width; j += 4) {
-            dst = output + (i * fromTexture->m_width + j) * 4;
-            bcdec_bc1(src, dst, (int) fromTexture->m_width * 4);
-            src += BCDEC_BC1_BLOCK_SIZE;
-        }
-    }
+    convertBCnToRGBA8888<BCDEC_BC1_BLOCK_SIZE, 4, 4>(fromTexture, toTexture, bcdec_bc1);
     return true;
 }
 
@@ -75,18 +107,7 @@ bool convertBC1atoRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_rawPixelData.size() <
         BCDEC_BC1_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
         return false;
-    int i, j;
-    const uint8_t *src = fromTexture->m_rawPixelData.data();
-    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
-    uint8_t *dst = toTexture->m_rawPixelData.data();
-    uint8_t *output = dst;
-    for (i = 0; i < fromTexture->m_height; i += 4) {
-        for (j = 0; j < fromTexture->m_width; j += 4) {
-            dst = output + (i * fromTexture->m_width + j) * 4;
-            bcdec_bc1(src, dst, (int) fromTexture->m_width * 4);
-            src += BCDEC_BC1_BLOCK_SIZE;
-        }
-    }
+    convertBCnToRGBA8888<BCDEC_BC1_BLOCK_SIZE, 4, 4>(fromTexture, toTexture, bcdec_bc1);
     return true;
 }
 
@@ -95,18 +116,7 @@ bool convertBC2toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_rawPixelData.size() <
         BCDEC_BC2_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
         return false;
-    int i, j;
-    const uint8_t *src = fromTexture->m_rawPixelData.data();
-    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
-    uint8_t *dst = toTexture->m_rawPixelData.data();
-    uint8_t *output = dst;
-    for (i = 0; i < fromTexture->m_height; i += 4) {
-        for (j = 0; j < fromTexture->m_width; j += 4) {
-            dst = output + (i * fromTexture->m_width + j) * 4;
-            bcdec_bc2(src, dst, (int) fromTexture->m_width * 4);
-            src += BCDEC_BC2_BLOCK_SIZE;
-        }
-    }
+    convertBCnToRGBA8888<BCDEC_BC2_BLOCK_SIZE, 4, 4>(fromTexture, toTexture, bcdec_bc2);
     return true;
 }
 
@@ -114,18 +124,7 @@ bool convertBC3toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_rawPixelData.size() <
         BCDEC_BC3_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
         return false;
-    int i, j;
-    const uint8_t *src = fromTexture->m_rawPixelData.data();
-    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
-    uint8_t *dst = toTexture->m_rawPixelData.data();
-    uint8_t *output = dst;
-    for (i = 0; i < fromTexture->m_height; i += 4) {
-        for (j = 0; j < fromTexture->m_width; j += 4) {
-            dst = output + (i * fromTexture->m_width + j) * 4;
-            bcdec_bc3(src, dst, (int) fromTexture->m_width * 4);
-            src += BCDEC_BC3_BLOCK_SIZE;
-        }
-    }
+    convertBCnToRGBA8888<BCDEC_BC3_BLOCK_SIZE, 4, 4>(fromTexture, toTexture, bcdec_bc3);
     return true;
 }
 
@@ -133,18 +132,7 @@ bool convertBC4toR8(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_rawPixelData.size() <
         BCDEC_BC4_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
         return false;
-    int i, j;
-    const uint8_t *src = fromTexture->m_rawPixelData.data();
-    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
-    uint8_t *dst = toTexture->m_rawPixelData.data();
-    uint8_t *output = dst;
-    for (i = 0; i < fromTexture->m_height; i += 4) {
-        for (j = 0; j < fromTexture->m_width; j += 4) {
-            dst = output + (i * fromTexture->m_width + j);
-            bcdec_bc4(src, dst, (int) fromTexture->m_width);
-            src += BCDEC_BC4_BLOCK_SIZE;
-        }
-    }
+    convertBCnToRGBA8888<BCDEC_BC4_BLOCK_SIZE, 4, 1>(fromTexture, toTexture, bcdec_bc4);
     return true;
 }
 
@@ -152,56 +140,30 @@ bool convertBC5toRG88(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_rawPixelData.size() <
         BCDEC_BC5_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
         return false;
-    int i, j;
-    const uint8_t *src = fromTexture->m_rawPixelData.data();
-    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
-    uint8_t *dst = toTexture->m_rawPixelData.data();
-    uint8_t *output = dst;
-    for (i = 0; i < fromTexture->m_height; i += 4) {
-        for (j = 0; j < fromTexture->m_width; j += 4) {
-            dst = output + (i * fromTexture->m_width + j) * 2;
-            bcdec_bc5(src, dst, (int) fromTexture->m_width * 2);
-            src += BCDEC_BC5_BLOCK_SIZE;
-        }
-    }
+    convertBCnToRGBA8888<BCDEC_BC5_BLOCK_SIZE, 4, 2>(fromTexture, toTexture, bcdec_bc5);
     return true;
+}
+
+void bcdec_bc6h_half_unsigned(const void *compressedBlock, void *decompressedBlock, int destinationPitch) {
+    bcdec_bc6h_half(compressedBlock, decompressedBlock, destinationPitch, false);
 }
 
 bool convertBC6toRGB16F(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_rawPixelData.size() <
         BCDEC_BC6H_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
         return false;
-    int i, j;
-    const uint8_t *src = fromTexture->m_rawPixelData.data();
-    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
-    uint8_t *dst = toTexture->m_rawPixelData.data();
-    uint8_t *output = dst;
-    for (i = 0; i < fromTexture->m_height; i += 4) {
-        for (j = 0; j < fromTexture->m_width; j += 4) {
-            dst = output + (i * fromTexture->m_width + j) * 6;
-            bcdec_bc6h_half(src, dst, (int) fromTexture->m_width * 3, false);
-            src += BCDEC_BC6H_BLOCK_SIZE;
-        }
-    }
+    convertBCnToRGBA8888<BCDEC_BC6H_BLOCK_SIZE, 4, 6>(fromTexture, toTexture,bcdec_bc6h_half_unsigned);
     return true;
 }
 
+void bcdec_bc6h_float_unsigned(const void *compressedBlock, void *decompressedBlock, int destinationPitch) {
+    bcdec_bc6h_float(compressedBlock, decompressedBlock, destinationPitch, false);
+}
 bool convertBC6toRGB32F(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_rawPixelData.size() <
         BCDEC_BC6H_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
         return false;
-    int i, j;
-    const uint8_t *src = fromTexture->m_rawPixelData.data();
-    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
-    uint8_t *dst = toTexture->m_rawPixelData.data();
-    uint8_t *output = dst;
-    for (i = 0; i < fromTexture->m_height; i += 4) {
-        for (j = 0; j < fromTexture->m_width; j += 4) {
-            dst = output + (i * fromTexture->m_width + j) * 12;
-            bcdec_bc6h_float(src, dst, (int) fromTexture->m_width * 3, false);
-            src += BCDEC_BC6H_BLOCK_SIZE;
-        }
-    }
+    convertBCnToRGBA8888<BCDEC_BC6H_BLOCK_SIZE, 4, 12>(fromTexture, toTexture,bcdec_bc6h_float_unsigned);
     return true;
 }
 
@@ -209,18 +171,7 @@ bool convertBC7toRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
     if (fromTexture->m_rawPixelData.size() <
         BCDEC_BC7_COMPRESSED_SIZE(fromTexture->m_width, fromTexture->m_height))
         return false;
-    int i, j;
-    const uint8_t *src = fromTexture->m_rawPixelData.data();
-    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
-    uint8_t *dst = toTexture->m_rawPixelData.data();
-    uint8_t *output = dst;
-    for (i = 0; i < fromTexture->m_height; i += 4) {
-        for (j = 0; j < fromTexture->m_width; j += 4) {
-            dst = output + (i * fromTexture->m_width + j) * 4;
-            bcdec_bc7(src, dst, (int) fromTexture->m_width * 4);
-            src += BCDEC_BC7_BLOCK_SIZE;
-        }
-    }
+    convertBCnToRGBA8888<BCDEC_BC7_BLOCK_SIZE, 4, 4>(fromTexture, toTexture,bcdec_bc7);
     return true;
 }
 
@@ -601,6 +552,44 @@ bool convertRGB32FtoRGBA32F(const sTexture *fromTexture, sTexture *toTexture) {
         toData[i * 4 + 1] = fromData[i * 3 + 1];
         toData[i * 4 + 2] = fromData[i * 3 + 2];
         toData[i * 4 + 3] = 1.f;
+    }
+    return true;
+}
+
+bool convertRGBA32FtoRGBA8888(const sTexture *fromTexture, sTexture *toTexture) {
+    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
+    const float *fromData = reinterpret_cast<const float *>(fromTexture->m_rawPixelData.data());
+    uint8_t *toData = toTexture->m_rawPixelData.data();
+    for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
+        toData[i * 4 + 0] = (uint8_t) (fromData[i * 4 + 0] * 255);
+        toData[i * 4 + 1] = (uint8_t) (fromData[i * 4 + 1] * 255);
+        toData[i * 4 + 2] = (uint8_t) (fromData[i * 4 + 2] * 255);
+        toData[i * 4 + 3] = (uint8_t) (fromData[i * 4 + 3] * 255);
+    }
+    return true;
+}
+
+bool convertR32FtoRGBA32F(const sTexture *fromTexture, sTexture *toTexture) {
+    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
+    const float *fromData = reinterpret_cast<const float *>(fromTexture->m_rawPixelData.data());
+    float *toData = reinterpret_cast<float *>(toTexture->m_rawPixelData.data());
+    for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
+        toData[i * 4 + 0] = fromData[i];
+        toData[i * 4 + 1] = fromData[i];
+        toData[i * 4 + 2] = fromData[i];
+        toData[i * 4 + 3] = 1.f;
+    }
+    return true;
+}
+
+bool convertR32FtoRGB32F(const sTexture *fromTexture, sTexture *toTexture) {
+    toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
+    const float *fromData = reinterpret_cast<const float *>(fromTexture->m_rawPixelData.data());
+    float *toData = reinterpret_cast<float *>(toTexture->m_rawPixelData.data());
+    for (int i = 0; i < fromTexture->m_width * fromTexture->m_height; i++) {
+        toData[i * 3 + 0] = fromData[i];
+        toData[i * 3 + 1] = fromData[i];
+        toData[i * 3 + 2] = fromData[i];
     }
     return true;
 }

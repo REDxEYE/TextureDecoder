@@ -7,4 +7,4 @@
 
 bool loadDDS(const std::filesystem::path &filename, sTexture *texture);
 
-bool loadDDS(uint8_t *data, size_t dataSize, sTexture *texture);
+bool loadDDS(const uint8_t *data, size_t dataSize, sTexture *texture);
