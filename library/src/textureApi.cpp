@@ -75,7 +75,7 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
 
     // Key for the converter map based on source and target formats
     uint32_t key = MAKE_PIXEL_PAIR(fromTexture->m_pixelFormat, toTexture->m_pixelFormat);
-    loggerEx(DEBUG, std::format("Convert key {}\n", key));
+    loggerEx(eLogLevel::DEBUG, std::format("Convert key {}\n", key));
     if (cConverters.contains(key)) {
         loggerEx(eLogLevel::DEBUG,
                  std::format("Converting from {} to {}\n", getPixelFormatName(fromTexture->m_pixelFormat),
@@ -154,7 +154,6 @@ bool convertTexture(const sTexture *fromTexture, sTexture *toTexture) {
 void freeTexture(sTexture *texture) {
     // Safely delete the texture and set the pointer to nullptr to avoid dangling pointers
     delete texture;
-    texture = nullptr;
 }
 
 

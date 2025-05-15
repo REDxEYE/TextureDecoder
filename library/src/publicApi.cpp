@@ -161,7 +161,7 @@ void print_all_converters() {
         uint32_t key = c_converter.first;
         const char *f1 = getPixelFormatName(static_cast<ePixelFormat>(key & 0xFFFF));
         const char *f2 = getPixelFormatName(static_cast<ePixelFormat>(key >> 16));
-        loggerEx(INFO, std::format("Converter ({}) {} -> {}\n", key, f1, f2));
+        loggerEx(eLogLevel::INFO, std::format("Converter ({}) {} -> {}\n", key, f1, f2));
     }
 }
 

@@ -173,7 +173,7 @@ bool loadVTF(uint8_t *data, size_t dataSize, sTexture *texture) {
         uint8_t *buffer = vtf.get_highres_image(buffer_size);
         texture->m_rawPixelData.assign(buffer, buffer + buffer_size);
     }
-    loggerEx(INFO, std::format("Loaded VTF {}x{} {}\n",vtf.width(),vtf.height(), getPixelFormatName(texture->m_pixelFormat)));
+    loggerEx(eLogLevel::INFO, std::format("Loaded VTF {}x{} {}\n",vtf.width(),vtf.height(), getPixelFormatName(texture->m_pixelFormat)));
 
     return texture;
 

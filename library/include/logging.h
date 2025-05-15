@@ -12,7 +12,7 @@ namespace std {
     using namespace fmt;
 }
 #endif
-enum eLogLevel {
+enum class eLogLevel {
     DEBUG,
     INFO,
     WARN,

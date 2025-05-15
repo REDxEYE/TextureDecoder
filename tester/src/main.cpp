@@ -1,12 +1,15 @@
 #include <gtest/gtest.h>
+
+#include "logging.h"
 #include "texture.h"
 #include "textureApi.h"
 #include "stb_image.h"
 
-
+extern eLogLevel logLevel;
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
+    logLevel = eLogLevel::DEBUG;
     return RUN_ALL_TESTS();
 }
 
