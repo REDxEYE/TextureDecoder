@@ -75,15 +75,14 @@ bool convertBCn(const sTexture *fromTexture, sTexture *toTexture, const Decoder 
     const uint8_t *src = fromTexture->m_rawPixelData.data();
     toTexture->m_rawPixelData.resize(calculateTextureSize(toTexture));
     uint8_t *output = toTexture->m_rawPixelData.data();
-    const uint32_t stride = fromTexture->m_width * 12;
+    const uint32_t stride = fromTexture->m_width * pixelSize;
     for (int y = 0; y < fromTexture->m_height; y += blockSize) {
-        uint8_t *dstRow = &output[y * stride];
         for (int x = 0; x < fromTexture->m_width; x += blockSize) {
             if (x >= toTexture->m_width) {
                 continue;
             }
 
-            uint8_t *dst = dstRow + x * pixelSize;
+            uint8_t *dst = output + y * stride + x * pixelSize;
 
             if (y + blockSize <= toTexture->m_height && x + blockSize <= toTexture->m_width) {
                 decoder((void *) src, dst, (int) stride);
