@@ -515,15 +515,12 @@ bool convertRGB565toRGB888(const sTexture *fromTexture, sTexture *toTexture) {
                 uint16_t g: 6;
                 uint16_t b: 5;
             } rgb;
-
             uint16_t d;
         } pixel;
-        pixel.d = uint16_t(fromTexture->m_rawPixelData[i * 2 + 1]) << 8 |
-                  fromTexture->m_rawPixelData[i * 2 + 0];
-
-        toTexture->m_rawPixelData[i * 3 + 0] = ((uint16_t) pixel.rgb.r * 255) / 31;
-        toTexture->m_rawPixelData[i * 3 + 1] = ((uint16_t) pixel.rgb.g * 255) / 63;
-        toTexture->m_rawPixelData[i * 3 + 2] = ((uint16_t) pixel.rgb.b * 255) / 31;
+        pixel.d = uint16_t(fromTexture->m_rawPixelData[i * 2 + 1]) << 8 | fromTexture->m_rawPixelData[i * 2 + 0];
+        toTexture->m_rawPixelData[i * 3 + 0] = (pixel.rgb.r * 527 + 23) >> 6;
+        toTexture->m_rawPixelData[i * 3 + 1] = 	(pixel.rgb.g * 259 + 33) >> 6;
+        toTexture->m_rawPixelData[i * 3 + 2] = (pixel.rgb.b * 527 + 23) >> 6;
     }
     return true;
 }
